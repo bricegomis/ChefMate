@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChefMate.API", "backend\api\ChefMate.API\ChefMate.API.csproj", "{D33D33D0-73F8-41B6-9E25-2BC99FF7EA96}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{CBE838A4-2DC3-4E20-BDAD-A1FD17D0BD7D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{A487F724-7B38-460E-BBF2-323A417FEA39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChefMate.Models", "common\ChefMate.Models\ChefMate.Models.csproj", "{F1410BD0-75B1-4539-AA45-47AD106E5DD1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E6C916B3-F90A-4531-A50E-6A110BC10AA2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D33D33D0-73F8-41B6-9E25-2BC99FF7EA96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D33D33D0-73F8-41B6-9E25-2BC99FF7EA96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D33D33D0-73F8-41B6-9E25-2BC99FF7EA96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D33D33D0-73F8-41B6-9E25-2BC99FF7EA96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1410BD0-75B1-4539-AA45-47AD106E5DD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1410BD0-75B1-4539-AA45-47AD106E5DD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1410BD0-75B1-4539-AA45-47AD106E5DD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1410BD0-75B1-4539-AA45-47AD106E5DD1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D33D33D0-73F8-41B6-9E25-2BC99FF7EA96} = {CBE838A4-2DC3-4E20-BDAD-A1FD17D0BD7D}
+		{F1410BD0-75B1-4539-AA45-47AD106E5DD1} = {E6C916B3-F90A-4531-A50E-6A110BC10AA2}
+	EndGlobalSection
+EndGlobal

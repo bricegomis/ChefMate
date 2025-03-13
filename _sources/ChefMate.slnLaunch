@@ -1,0 +1,17 @@
+[
+  {
+    "Name": "Back&Front",
+    "Projects": [
+      {
+        "Path": "backend\\api\\ChefMate.API\\ChefMate.API.csproj",
+        "Action": "Start",
+        "DebugTarget": "Container (Dockerfile)"
+      },
+      {
+        "Path": "frontend\\ChefMate.Maui\\ChefMate.Maui.csproj",
+        "Action": "Start",
+        "DebugTarget": "Windows Machine"
+      }
+    ]
+  }
+]
