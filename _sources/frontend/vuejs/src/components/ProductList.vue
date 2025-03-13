@@ -3,7 +3,7 @@
     <q-table
       class="my-sticky-header-column-table"
       :columns="allColumns"
-      :rows="products"
+      :rows="filteredProducts"
       row-key="id"
       separator="cell"
       flat
@@ -12,28 +12,68 @@
       title="Produits"
       :rows-per-page-options="[20, 50, 100]"
     >
-      <!-- <template v-slot:header="props">
-        <q-tr :props="props">
-          <q-th auto-width />
-          <q-th v-for="col in props.cols" :key="col.name" :props="props">
-            {{ col.label }}
-          </q-th>
-        </q-tr>
+      <template v-slot:top>
+        <div class="row">
+          <div class="col q-table__title">Products</div>
+          <div class="col-auto">
+            <q-input
+              borderless
+              dense
+              debounce="300"
+              color="primary"
+              v-model="filter"
+            >
+              <template v-slot:append>
+                <q-icon name="search" />
+              </template>
+            </q-input>
+          </div>
+        </div>
+        <div class="row">
+          <q-expansion-item expand-separator icon="filter_list" label="Filters">
+            <q-toggle
+              v-model="selectAllTypes"
+              label="Select All"
+            />
+            <q-toggle
+              v-for="type in types"
+              :key="type"
+              v-model="visibleTypes"
+              :val="type"
+              :label="type"
+            />
+          </q-expansion-item>
+        </div>
       </template>
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td auto-width>
-            <q-btn
-              size="sm"
-              color="accent"
-              round
-              flat
-              dense
-              @click="props.expand = !props.expand"
-              :icon="props.expand ? 'remove' : 'add'"
-            />
+          <q-td
+            :props="props"
+            key="name"
+            @click="props.expand = !props.expand"
+            class="cursor-pointer"
+          >
+            <span class="">{{ props.row.name }}</span>
+            <span class="text-italic text-caption">{{
+              props.row.comments
+            }}</span>
           </q-td>
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+          <q-td :props="props" key="labels">
+            <q-chip
+              v-for="(label, index) in props.row.labels"
+              :key="index"
+              color="primary"
+              text-color="white"
+              class="q-mr-sm"
+            >
+              {{ label }}
+            </q-chip>
+          </q-td>
+          <q-td
+            v-for="col in props.cols.slice(2)"
+            :key="col.name"
+            :props="props"
+          >
             {{ col.value }}
           </q-td>
         </q-tr>
@@ -48,42 +88,20 @@
             </div>
           </q-td>
         </q-tr>
-      </template> -->
-      <template v-slot:body-cell-name="props">
-        <q-td
-          :props="props"
-          @click="props.expand = !props.expand"
-          class="cursor-pointer"
-        >
-          <!-- <q-icon
-            :name="props.expand ? 'expand_less' : 'expand_more'"
-            class="q-mr-sm"
-          /> -->
-          {{ props.row.name }}
-        </q-td>
-      </template>
-      <template v-slot:body-cell-labels="props">
-        <q-td :props="props">
-          <q-chip
-            v-for="(label, index) in props.row.labels"
-            :key="index"
-            color="primary"
-            text-color="white"
-            class="q-mr-sm"
-          >
-            {{ label }}
-          </q-chip>
-        </q-td>
       </template>
     </q-table>
   </div>
 </template>
+
 <script setup lang="ts">
 import { Product } from 'src/models/Product';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
   products: Product[];
 }>();
+
+const filter = ref<string>('');
 
 const columns = [
   {
@@ -98,7 +116,7 @@ const columns = [
     label: 'Labels',
     field: 'labels',
   },
-  { name: 'comments', label: 'Comments', field: 'comments', sortable: true },
+  // { name: 'comments', label: 'Comments', field: 'comments', sortable: true },
   { name: 'type', label: 'Type', field: 'type', sortable: true },
   { name: 'tags', label: 'Tags', field: 'tags', sortable: true },
   {
@@ -112,29 +130,29 @@ const columns = [
   },
   { name: 'unit', label: 'Unit', field: 'unit', sortable: true },
 ];
-// const subColumns = [
-//   {
-//     name: 'store',
-//     label: 'Store',
-//     field: 'storeName',
-//     sortable: true,
-//     style: 'width: 80px',
-//   },
-//   {
-//     name: 'price',
-//     label: 'Price',
-//     field: 'price',
-//     sortable: true,
-//     style: 'width: 50px',
-//   },
-//   {
-//     name: 'date',
-//     label: 'Date',
-//     field: 'dateBuying',
-//     sortable: true,
-//     style: 'width: 100px',
-//   },
-// ];
+const subColumns = [
+  {
+    name: 'store',
+    label: 'Store',
+    field: 'storeName',
+    sortable: true,
+    style: 'width: 80px',
+  },
+  {
+    name: 'price',
+    label: 'Price',
+    field: 'price',
+    sortable: true,
+    style: 'width: 50px',
+  },
+  {
+    name: 'date',
+    label: 'Date',
+    field: 'dateBuying',
+    sortable: true,
+    style: 'width: 100px',
+  },
+];
 
 // Create the list of stores
 const stores = Array.from(
@@ -161,24 +179,40 @@ const storeColumns = stores.map((store) => ({
 const allColumns = [...columns, ...storeColumns];
 
 const products = props.products.map((product) => {
-  const lowestPrice = product.prices
-    ? Math.min(...product.prices.map((priceItem) => priceItem.price))
-    : null;
-  const storePrices = stores.reduce(
-    (acc: { [key: string]: number | null }, store: string) => {
-      const priceItem = product.prices?.find(
-        (price) => price.storeName === store
-      );
-      acc[store] = priceItem ? priceItem.price : null;
-      return acc;
-    },
-    {}
-  );
-  return {
-    ...product,
-    lowestPrice,
-    storePrices,
-  };
+    const lowestPrice = product.prices
+      ? Math.min(...product.prices.map((priceItem) => priceItem.price))
+      : null;
+    const storePrices = stores.reduce(
+      (acc: { [key: string]: number | null }, store: string) => {
+        const priceItem = product.prices?.find(
+          (price) => price.storeName === store
+        );
+        acc[store] = priceItem ? priceItem.price : null;
+        return acc;
+      },
+      {}
+    );
+    return {
+      ...product,
+      lowestPrice,
+      storePrices,
+    };
+  });
+
+const types = computed(() => {
+  return Array.from(new Set(products.flatMap((product) => product.type || [])));
+});
+
+const visibleTypes = ref(types.value);
+const selectAllTypes = ref(true);
+
+watch(selectAllTypes, (newValue) => {
+  visibleTypes.value = newValue ? types.value : [];
+});
+
+// Filter products based on visibleTypes
+const filteredProducts = computed(() => {
+  return products.filter(product => product.type && visibleTypes.value.includes(product.type));
 });
 </script>
 <style lang="sass">
