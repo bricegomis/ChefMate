@@ -14,27 +14,23 @@
     >
       <template v-slot:top>
         <div class="row">
-          <div class="col q-table__title">Products</div>
           <div class="col-auto">
             <q-input
               borderless
               dense
               debounce="300"
-              color="primary"
               v-model="filter"
+              filled
             >
               <template v-slot:append>
-                <q-icon name="search" />
+                <q-icon name="search" color="primary" />
               </template>
             </q-input>
           </div>
         </div>
         <div class="row">
           <q-expansion-item expand-separator icon="filter_list" label="Filters">
-            <q-toggle
-              v-model="selectAllTypes"
-              label="Select All"
-            />
+            <q-toggle v-model="selectAllTypes" label="Select All" />
             <q-toggle
               v-for="type in types"
               :key="type"
@@ -179,25 +175,25 @@ const storeColumns = stores.map((store) => ({
 const allColumns = [...columns, ...storeColumns];
 
 const products = props.products.map((product) => {
-    const lowestPrice = product.prices
-      ? Math.min(...product.prices.map((priceItem) => priceItem.price))
-      : null;
-    const storePrices = stores.reduce(
-      (acc: { [key: string]: number | null }, store: string) => {
-        const priceItem = product.prices?.find(
-          (price) => price.storeName === store
-        );
-        acc[store] = priceItem ? priceItem.price : null;
-        return acc;
-      },
-      {}
-    );
-    return {
-      ...product,
-      lowestPrice,
-      storePrices,
-    };
-  });
+  const lowestPrice = product.prices
+    ? Math.min(...product.prices.map((priceItem) => priceItem.price))
+    : null;
+  const storePrices = stores.reduce(
+    (acc: { [key: string]: number | null }, store: string) => {
+      const priceItem = product.prices?.find(
+        (price) => price.storeName === store
+      );
+      acc[store] = priceItem ? priceItem.price : null;
+      return acc;
+    },
+    {}
+  );
+  return {
+    ...product,
+    lowestPrice,
+    storePrices,
+  };
+});
 
 const types = computed(() => {
   return Array.from(new Set(products.flatMap((product) => product.type || [])));
@@ -212,7 +208,9 @@ watch(selectAllTypes, (newValue) => {
 
 // Filter products based on visibleTypes
 const filteredProducts = computed(() => {
-  return products.filter(product => product.type && visibleTypes.value.includes(product.type));
+  return products.filter(
+    (product) => product.type && visibleTypes.value.includes(product.type)
+  );
 });
 </script>
 <style lang="sass">
