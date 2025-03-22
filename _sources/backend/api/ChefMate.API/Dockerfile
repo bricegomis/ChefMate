@@ -9,14 +9,14 @@ ENV ASPNETCORE_URLS=http://*:8080
 # Build API
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
+WORKDIR /src/api
 
 # Copy all projects to the container
-COPY ["api/ChefMate.API/ChefMate.API.csproj", "api/ChefMate.API/"]
-COPY ["models/ChefMate.Models/ChefMate.Models.csproj", "models/ChefMate.Models/"]
+COPY ["ChefMate.API/ChefMate.API.csproj", "ChefMate.API/"]
+COPY ["ChefMate.Models/ChefMate.Models.csproj", "ChefMate.Models/"]
 
 # Restore dependencies
-RUN dotnet restore "api/ChefMate.API/ChefMate.API.csproj"
+RUN dotnet restore "ChefMate.API/ChefMate.API.csproj"
 
 # Copy the rest of the source code
 COPY . .
