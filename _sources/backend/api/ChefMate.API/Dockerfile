@@ -13,7 +13,7 @@ WORKDIR /src
 
 # Copy all projects to the container
 COPY ["api/ChefMate.API/ChefMate.API.csproj", "api/ChefMate.API/"]
-COPY ["models/ChefMate.Models/ChefMate.Models.csproj", "models/ChefMate.Models/"]
+COPY ["api/ChefMate.Models/ChefMate.Models.csproj", "api/ChefMate.Models/"]
 
 # Restore dependencies
 RUN dotnet restore "api/ChefMate.API/ChefMate.API.csproj"
