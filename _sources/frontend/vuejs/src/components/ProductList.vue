@@ -48,10 +48,21 @@
             @click="props.expand = !props.expand"
             class="cursor-pointer"
           >
-            <span class="">{{ props.row.name }}</span>
+            <span class="">{{ props.row.name }}</span
+            ><br />
             <span class="text-italic text-caption">{{
               props.row.comments
             }}</span>
+          </q-td>
+          <q-td :props="props" key="actions">
+            <q-btn
+              flat
+              dense
+              size="sm"
+              icon="delete"
+              color="negative"
+              @click="deleteProduct(props.row)"
+            />
           </q-td>
           <q-td :props="props" key="labels">
             <q-chip
@@ -134,6 +145,12 @@ const columns = [
     field: 'name',
     sortable: true,
     style: 'width: 250px',
+  },
+  {
+    name: 'actions',
+    label: '',
+    field: '',
+    sortable: false,
   },
   {
     name: 'labels',
@@ -265,6 +282,10 @@ function addLabel(scope: { value: string[] }) {
     scope.value.push(newLabel.value.trim());
     newLabel.value = '';
   }
+}
+function deleteProduct(product: Product) {
+  const productStore = useProductStore();
+  productStore.deleteProduct(product);
 }
 </script>
 <style lang="sass">

@@ -73,12 +73,12 @@ public class ProductController(ILogger<ProductController> logger,
         await _productManager.UpdateProduct(item);
     }
 
-    //[HttpDelete("{id}", Name = "Delete")]
-    //[SwaggerResponse((int)System.Net.HttpStatusCode.OK)]
-    //public async Task DeleteProduct(string id)
-    //{
-    //    _logger.LogDebug("DeleteProduct called with id: {id}", id ?? "null");
-    //    if (id == null) return;
-    //    await _productManager.DeleteProduct(id);
-    //}
+    [HttpDelete("{id}", Name = "Delete")]
+    [SwaggerResponse((int)System.Net.HttpStatusCode.OK)]
+    public async Task DeleteProduct(string id)
+    {
+        _logger.LogDebug("DeleteProduct called with id: {id}", id ?? "null");
+        if (id == null) return;
+        await _productManager.DeleteProduct(id);
+    }
 }

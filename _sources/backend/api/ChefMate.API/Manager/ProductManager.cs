@@ -83,21 +83,20 @@ public class ProductManager(ILogger logger,
         await _mongoDBService.UpdateProduct(product);
     }
 
-    //public async Task DeleteProduct(string id)
-    //{
-    //    if (_profileManager.CurrentProfile is null) return;
-    //    // Check the product online to be sure
-    //    var product = await _mongoDBService.GetProduct(id);
-    //    if (product is null || product.Id is null) return;
-    //    if (product.ProfileId != _profileManager.CurrentProfile.Id)
-    //    {
-    //        _logger.LogWarning("Try to delete a product with different profileId than currentProfile");
-    //        return;
-    //    }
+    public async Task DeleteProduct(string id)
+    {
+        if (_profileManager.CurrentProfile is null) return;
+        // Check the product online to be sure
+        var product = await _mongoDBService.GetProduct(id);
+        if (product is null || product.Id is null) return;
+        if (product.ProfileId != _profileManager.CurrentProfile.Id)
+        {
+            _logger.LogWarning("Try to delete a product with different profileId than currentProfile");
+            return;
+        }
 
-    //    _profileManager.CurrentProfile.productIds.Remove(product.Id);
-    //    await _mongoDBService.DeleteProduct(product.Id);
-    //}
+        await _mongoDBService.DeleteProduct(product.Id);
+    }
 
     public async Task CreateProduct(Product product)
     {
