@@ -12,16 +12,11 @@
       title="Produits"
       :rows-per-page-options="[20, 50, 100]"
     >
+      <!-- TOP SLOT -->
       <template v-slot:top>
         <div class="row">
           <div class="col-auto">
-            <q-input
-              borderless
-              dense
-              debounce="300"
-              v-model="filter"
-              filled
-            >
+            <q-input borderless dense debounce="300" v-model="filter" filled>
               <template v-slot:append>
                 <q-icon name="search" color="primary" />
               </template>
@@ -41,8 +36,10 @@
           </q-expansion-item>
         </div>
       </template>
+      <!-- BODY SLOT -->
       <template v-slot:body="props">
         <q-tr :props="props">
+          <!-- NAME -->
           <q-td
             :props="props"
             key="name"
@@ -50,9 +47,7 @@
             class="cursor-pointer"
           >
             <span class="">{{ props.row.name }}</span>
-            <span class="text-italic text-caption">{{
-              props.row.comments
-            }}</span>
+            <span class="text-italic text-caption">{{ props.row.comments }}</span>
           </q-td>
           <q-td :props="props" key="labels">
             <q-chip
@@ -64,12 +59,27 @@
             >
               {{ label }}
             </q-chip>
+            <q-popup-edit v-model="props.row.labels" v-slot="scope">
+              <div class="q-pa-sm">
+                <q-chip
+                  v-for="(label, index) in scope.value"
+                  :key="index"
+                  removable
+                  @remove="removeLabel(props.row, label)"
+                  class="q-mr-sm"
+                >
+                  {{ label }}
+                </q-chip>
+                <q-input
+                  v-model="newLabel"
+                  dense
+                  placeholder="Add label"
+                  @keyup.enter="addLabel(scope)"
+                />
+              </div>
+            </q-popup-edit>
           </q-td>
-          <q-td
-            v-for="col in props.cols.slice(2)"
-            :key="col.name"
-            :props="props"
-          >
+          <q-td v-for="col in props.cols.slice(2)" :key="col.name" :props="props">
             {{ col.value }}
           </q-td>
         </q-tr>
@@ -91,6 +101,7 @@
 
 <script setup lang="ts">
 import { Product } from 'src/models/Product';
+import { useProductStore } from 'src/stores/product-store';
 import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -180,9 +191,7 @@ const products = props.products.map((product) => {
     : null;
   const storePrices = stores.reduce(
     (acc: { [key: string]: number | null }, store: string) => {
-      const priceItem = product.prices?.find(
-        (price) => price.storeName === store
-      );
+      const priceItem = product.prices?.find((price) => price.storeName === store);
       acc[store] = priceItem ? priceItem.price : null;
       return acc;
     },
@@ -212,10 +221,27 @@ const filteredProducts = computed(() => {
     (product) => product.type && visibleTypes.value.includes(product.type)
   );
 });
+
+const newLabel = ref<string>('');
+
+function removeLabel(product: Product, label: string) {
+  if (product.labels) {
+    product.labels = product.labels.filter((l) => l !== label);
+    useProductStore().updateProduct(product);
+  }
+}
+
+// Fonction pour ajouter un label
+function addLabel(scope: { value: string[] }) {
+  if (newLabel.value.trim() && !scope.value.includes(newLabel.value.trim())) {
+    scope.value.push(newLabel.value.trim());
+    newLabel.value = '';
+  }
+}
 </script>
 <style lang="sass">
 .my-sticky-header-column-table
-  td:nth-child(2)
+  td:first-child
     background-color: $accent
     z-index: 1
     position: sticky
@@ -237,7 +263,7 @@ const filteredProducts = computed(() => {
   tr:first-child th:first-child
     /* highest z-index */
     z-index: 3
-  td:nth-child(2), th:first-child
+  td:first-child, th:first-child
     position: sticky
     left: 0
 

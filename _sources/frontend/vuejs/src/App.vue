@@ -14,14 +14,14 @@ defineOptions({
 });
 
 const loop = async () => {
-  try {
-    await productStore.fetchProfile();
-    await productStore.fetchProducts();
-  } catch (error) {
-    // console.error('Error fetching items:', error);
-  } finally {
-    setTimeout(loop, 5000);
-  }
+  // try {
+  await productStore.fetchProfile();
+  await productStore.fetchProducts();
+  // } catch (error) {
+  //   // console.error('Error fetching items:', error);
+  // } finally {
+  //   setTimeout(loop, 5000);
+  // }
 };
 
 onMounted(() => {
