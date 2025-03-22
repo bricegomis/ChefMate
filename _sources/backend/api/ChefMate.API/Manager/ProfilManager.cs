@@ -1,5 +1,6 @@
 ﻿using ChefMate.Models;
 using ChefMate.API.Services;
+using MongoDB.Bson;
 
 namespace ChefMate.API.Manager;
 
@@ -23,7 +24,7 @@ public class ProfileManager(ILogger logger,
             _logger.LogInformation("========================> CurrentProfile null, creating new one");
             await _mongoDBService.CreateProfile(new Profile
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = ObjectId.GenerateNewId().ToString(),
                 Login = _login,
                 DateCreated = _dateTimeProvider.GetNow(),
                 DateLastConnection = _dateTimeProvider.GetNow()

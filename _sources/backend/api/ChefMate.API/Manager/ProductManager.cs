@@ -10,59 +10,10 @@ public class ProductManager(ILogger logger,
                                IProfileManager profileManager,
                                IDateTimeProvider dateTimeProvider) : IProductManager
 {
-    private const string _login = "Test";
     private readonly IMongoDBService _mongoDBService = mongoDBService;
     private readonly IProfileManager _profileManager = profileManager;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly ILogger _logger = logger;
-    
-    //public async Task FinishProduct(Product productFrom)
-    //{
-    //    if (productFrom is null || productFrom.Id is null)
-    //    {
-    //        _logger.LogError("product is null");
-    //        return;
-    //    }
-    //    if (_profileManager.CurrentProfile is null)
-    //    {
-    //        _logger.LogError("CurrentProfile is null");
-    //        return;
-    //    }
-    //    var product = await _mongoDBService.GetProduct(productFrom.Id);
-    //    if (product is null)
-    //    {
-    //        _logger.LogError($"product not found with id {productFrom.Id}");
-    //        return;
-    //    }
-
-    //    // Force the profilId to ensure it's not update from the client
-    //    product.ProfileId = _profileManager.CurrentProfile.Id;
-    //    product.DateModified = _dateTimeProvider.GetNow();
-
-    //    if (product.History is null)
-    //        product.History = [];
-    //    product.History.Add(_dateTimeProvider.GetNow());
-    //    product.HistoryBonus += 1;// TODO: reduce if bad ?
-
-    //    if (product.Points.HasValue) {
-    //        var pts = product.IsReward == true ? product.Points.Value : -product.Points.Value;
-    //        _profileManager.CurrentProfile.ScoreTotal += pts;
-    //        _profileManager.CurrentProfile.ScoreWeek += pts;
-    //        _profileManager.CurrentProfile.ScoreDay += pts;
-    //    }
-
-    //    await _mongoDBService.UpdateProduct(product);
-    //    await _mongoDBService.UpdateProfile(_profileManager.CurrentProfile);
-
-    //    var history = new HistoryItem
-    //    {
-    //        Item = product,
-    //        Date = _dateTimeProvider.GetNow(),
-    //        Points = product.IsReward == true ? product.Points ?? 0 : -product.Points ?? 0,
-    //        ProfileId = _profileManager.CurrentProfile.Id
-    //    };
-    //    await _mongoDBService.CreateHistory(history);
-    //}
 
     public async Task UpdateProduct(Product product)
     {
@@ -101,8 +52,8 @@ public class ProductManager(ILogger logger,
     public async Task CreateProduct(Product product)
     {
         _logger.LogInformation("CreateProduct");
-        if (_profileManager.CurrentProfile == null || product is null
-            || product.Id is null)
+        if (_profileManager.CurrentProfile == null
+            || product is null)
         {
             _logger.LogError("_profileManager.CurrentProfile not defined");
             return;
@@ -128,6 +79,6 @@ public class ProductManager(ILogger logger,
 
     public async Task CustomMethod()
     {
-        await _mongoDBService.CustomMethod();
+        await _mongoDBService.CustomMethod(_profileManager.CurrentProfile.Id);
     }
 }

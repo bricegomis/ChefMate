@@ -32,10 +32,8 @@ export const useProductStore = defineStore('ProductStore', {
     },
     async getProduct(id: string) {
       try {
-        console.log('api.getProduct', id);
         const response = await api.get(`product/${id}`);
         this.editingProduct = response.data; //TODO check if it's the right name
-        console.log('this.getProduct', this.editingProduct);
       } catch (error) {
         console.error('Error fetching Product:', error);
       }

@@ -1,5 +1,7 @@
 ﻿using ChefMate.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChefMate.API.Services;
 
@@ -31,9 +33,10 @@ public class MongoDBService : IMongoDBService
         _profileCollection = database.GetCollection<Profile>(profileCollectionName);
     }
 
-    public async Task CustomMethod()
+    public async Task CustomMethod(string profileId)
     {
-        var updateDefinition = Builders<Product>.Update.Set(product => product.Labels, ["Bio"]);
+        var updateDefinition = Builders<Product>.Update.Set(product => product.ProfileId, profileId)
+            .Set(_ => _.IsDeleted, false);
 
         var result = await _productCollection.UpdateManyAsync(
             filter: Builders<Product>.Filter.Empty,
@@ -43,7 +46,9 @@ public class MongoDBService : IMongoDBService
 
     public async Task<List<Product>> GetAllProducts(string profileId)
     {
-        var productCursor = await _productCollection.FindAsync(_ => _.ProfileId == profileId);
+        var productCursor = await _productCollection
+            .FindAsync(_ => _.ProfileId == profileId
+                        && (!_.IsDeleted.HasValue || _.IsDeleted == false));
         var products = await productCursor.ToListAsync();
         return products;
     }
@@ -68,7 +73,19 @@ public class MongoDBService : IMongoDBService
 
     public async Task DeleteProduct(string id)
     {
-        await _productCollection.DeleteOneAsync(x => x.Id == id);
+        var result = await _productCollection.UpdateManyAsync(
+            filter: Builders<Product>.Filter.Eq(_ => _.Id, id),
+            update: Builders<Product>.Update
+                .Set(_ => _.IsDeleted, true)
+                .Set(_ => _.DateModified, _dateTimeProvider.GetNow())
+                .Set(_ => _.DateDeleted, _dateTimeProvider.GetNow())
+        );
+
+        if (!result.IsAcknowledged
+            || result.MatchedCount != 1)
+        {
+            _logger.LogInformation("Unable to flag product to deleted");
+        }
     }
 
     #region Profiles

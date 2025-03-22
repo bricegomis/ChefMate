@@ -13,6 +13,5 @@ public class Product : ModelBase
     public string? Unit { get; set; }
     public List<PriceItem>? Prices { get; set; }
     public List<string>? Tags { get; set; }
-    [BsonRepresentation(BsonType.ObjectId)]
     public string? ProfileId { get; set; }
 }

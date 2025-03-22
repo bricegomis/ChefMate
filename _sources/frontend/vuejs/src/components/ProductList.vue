@@ -23,18 +23,22 @@
             </q-input>
           </div>
           <div class="col-10">
-            <q-chip
+            <q-btn
               v-for="type in types"
               :key="type.name"
-              v-model:selected="type.isSelected"
-              color="primary"
-              text-color="white"
+              :outline="!type.isSelected"
+              square
+              size="sm"
+              class="q-ma-xs"
+              color="green"
+              @click="toggleType(type, $event)"
+              :text-color="type.isSelected ? 'white' : 'black'"
             >
-              <!-- <q-badge color="orange" rounded floating>{{
-                type.nbOccurrence
-              }}</q-badge> -->
-              {{ type.name }} ({{ type.nbOccurrence }})
-            </q-chip>
+              <span class="">{{ type.name }}</span>
+              <span class="text-italic text-weight-thin"
+                >&nbsp; ({{ type.nbOccurrence }})</span
+              >
+            </q-btn>
           </div>
         </div>
       </template>
@@ -61,8 +65,34 @@
               size="sm"
               icon="delete"
               color="negative"
-              @click="deleteProduct(props.row)"
-            />
+              @click="confirmDelete(props.row)"
+            >
+              <q-dialog v-model="confirmDeleteDialog" persistent>
+                <q-card>
+                  <q-card-section class="row items-center">
+                    <q-avatar icon="alert" color="primary" text-color="white" />
+                    <span class="q-ml-sm">Are you sure ?</span>
+                  </q-card-section>
+
+                  <q-card-actions align="right">
+                    <q-btn
+                      flat
+                      label="Ok"
+                      @click="deleteProduct"
+                      color="primary"
+                      v-close-popup
+                    />
+                    <q-btn
+                      flat
+                      label="Cancel"
+                      @click="deletingProduct = null"
+                      color="primary"
+                      v-close-popup
+                    />
+                  </q-card-actions>
+                </q-card>
+              </q-dialog>
+            </q-btn>
           </q-td>
           <q-td :props="props" key="labels">
             <q-chip
@@ -98,13 +128,14 @@
             <q-select
               filled
               v-model="props.row.type"
-              :options="Object.keys(types)"
-              label="Standard"
+              :options="types"
+              option-label="name"
+              option-value="name"
               emit-value
             />
           </q-td>
           <q-td
-            v-for="col in props.cols.slice(2)"
+            v-for="col in props.cols.slice(4)"
             :key="col.name"
             :props="props"
           >
@@ -130,13 +161,27 @@
 <script setup lang="ts">
 import { Product } from 'src/models/Product';
 import { useProductStore } from 'src/stores/product-store';
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 const props = defineProps<{
   products: Product[];
 }>();
 
 const filter = ref<string>('');
+
+const confirmDeleteDialog = ref(false);
+const deletingProduct = ref<Product | null>(null);
+
+function confirmDelete(product: Product) {
+  deletingProduct.value = product;
+  confirmDeleteDialog.value = true;
+}
+
+function deleteProduct() {
+  if (!deletingProduct.value) return;
+  const productStore = useProductStore();
+  productStore.deleteProduct(deletingProduct.value);
+}
 
 const columns = [
   {
@@ -219,30 +264,32 @@ const storeColumns = stores.map((store) => ({
 // Ajout des colonnes des magasins aux colonnes existantes
 const allColumns = [...columns, ...storeColumns];
 
-const products = props.products.map((product) => {
-  const lowestPrice = product.prices
-    ? Math.min(...product.prices.map((priceItem) => priceItem.price))
-    : null;
-  const storePrices = stores.reduce(
-    (acc: { [key: string]: number | null }, store: string) => {
-      const priceItem = product.prices?.find(
-        (price) => price.storeName === store
-      );
-      acc[store] = priceItem ? priceItem.price : null;
-      return acc;
-    },
-    {}
-  );
-  return {
-    ...product,
-    lowestPrice,
-    storePrices,
-  };
+const products = computed(() => {
+  return props.products.map((product) => {
+    const lowestPrice = product.prices
+      ? Math.min(...product.prices.map((priceItem) => priceItem.price))
+      : null;
+    const storePrices = stores.reduce(
+      (acc: { [key: string]: number | null }, store: string) => {
+        const priceItem = product.prices?.find(
+          (price) => price.storeName === store
+        );
+        acc[store] = priceItem ? priceItem.price : null;
+        return acc;
+      },
+      {}
+    );
+    return {
+      ...product,
+      lowestPrice,
+      storePrices,
+    };
+  });
 });
 
 const types = ref(
   Object.entries(
-    products.reduce((acc: Record<string, number>, product) => {
+    products.value.reduce((acc: Record<string, number>, product) => {
       if (product.type) {
         acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
       }
@@ -250,21 +297,40 @@ const types = ref(
     }, {})
   )
     .sort((a, b) => b[1] - a[1]) // Sort by occurrences in descending order
-    .map(([name, nbOccurrence]) => ({
-      name,
-      isSelected: ref(true), // Default all types to true as reactive refs
-      nbOccurrence,
-    }))
+    .map(([name, nbOccurrence]) =>
+      reactive({
+        name,
+        isSelected: ref<boolean>(true),
+        nbOccurrence,
+      })
+    )
 );
+
+// Function to toggle the selection of a type
+function toggleType(
+  selectedType: { name: string; isSelected: boolean },
+  event: Event
+) {
+  const mouseEvent = event as MouseEvent;
+  if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
+    selectedType.isSelected = !selectedType.isSelected;
+  } else {
+    types.value.forEach((type) => {
+      type.isSelected = type == selectedType;
+    });
+  }
+}
 
 // Filter products based on selected types
 const filteredProducts = computed(() => {
   const selectedTypes = types.value
     .filter((type) => type.isSelected)
     .map((type) => type.name);
-  return products.filter(
-    (product) => product.type && selectedTypes.includes(product.type)
-  );
+  return selectedTypes.length
+    ? products.value.filter(
+        (product) => product.type && selectedTypes.includes(product.type)
+      )
+    : [];
 });
 
 const newLabel = ref<string>('');
@@ -282,10 +348,6 @@ function addLabel(scope: { value: string[] }) {
     scope.value.push(newLabel.value.trim());
     newLabel.value = '';
   }
-}
-function deleteProduct(product: Product) {
-  const productStore = useProductStore();
-  productStore.deleteProduct(product);
 }
 </script>
 <style lang="sass">
@@ -320,4 +382,6 @@ function deleteProduct(product: Product) {
   tbody
     /* height of all previous header rows */
     scroll-margin-top: 48px
+.q-chip
+  width: 100px
 </style>

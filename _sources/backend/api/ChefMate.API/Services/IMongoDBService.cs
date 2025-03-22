@@ -4,7 +4,7 @@ namespace ChefMate.API.Services;
 
 public interface IMongoDBService
 {
-    Task CustomMethod();
+    Task CustomMethod(string profileId);
     Task<List<Product>> GetAllProducts(string profileId);
     Task<Product> GetProduct(string id);
     Task CreateProduct(Product product);
