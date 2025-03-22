@@ -19,9 +19,7 @@ public class Startup(IConfiguration configuration)
         {
             options.AddDefaultPolicy(builder =>
             {
-                builder.AllowAnyOrigin()
-                       .AllowAnyMethod()
-                       .AllowAnyHeader();
+                builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
             });
         });
 
@@ -32,8 +30,7 @@ public class Startup(IConfiguration configuration)
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "ChefMate.API", Version = "v1" });
         });
 
-        if (string.IsNullOrEmpty(mongoDbConnectionString)
-            || string.IsNullOrEmpty(dbName))
+        if (string.IsNullOrEmpty(mongoDbConnectionString) || string.IsNullOrEmpty(dbName))
         {
             throw new Exception("MongoDB Connection string & DbName not found");
         }
@@ -41,22 +38,28 @@ public class Startup(IConfiguration configuration)
         var loggerFactory = LoggerFactory.Create(builder => builder.AddSerilog(Log.Logger));
         var datetimeProvider = new DateTimeProvider();
 
-        var mongoDBService = new MongoDBService(loggerFactory.CreateLogger<MongoDBService>(),
-                                                datetimeProvider,
-                                                mongoDbConnectionString,
-                                                dbName);
+        var mongoDBService = new MongoDBService(
+            loggerFactory.CreateLogger<MongoDBService>(),
+            datetimeProvider,
+            mongoDbConnectionString,
+            dbName
+        );
         services.AddSingleton<IMongoDBService>(mongoDBService);
 
-        var profilManager = new ProfileManager(loggerFactory.CreateLogger<IProfileManager>(),
-                                               mongoDBService,
-                                               datetimeProvider);
+        var profilManager = new ProfileManager(
+            loggerFactory.CreateLogger<IProfileManager>(),
+            mongoDBService,
+            datetimeProvider
+        );
         services.AddSingleton<IProfileManager>(profilManager);
         profilManager.InitDefaultProfile().GetAwaiter().GetResult();
-        var productManager = new ProductManager(loggerFactory.CreateLogger<IProductManager>(),
-                                            mongoDBService,
-                                            profilManager,
-                                            datetimeProvider);
-        
+        var productManager = new ProductManager(
+            loggerFactory.CreateLogger<IProductManager>(),
+            mongoDBService,
+            profilManager,
+            datetimeProvider
+        );
+
         services.AddSingleton<IProductManager>(productManager);
         //services.AddSingleton<IHostedService>(provider => manager);
 
