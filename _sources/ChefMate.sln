@@ -9,8 +9,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "backend", "backend", "{CBE8
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "frontend", "frontend", "{A487F724-7B38-460E-BBF2-323A417FEA39}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChefMate.Models", "backend\api\ChefMate.Models\ChefMate.Models.csproj", "{F1410BD0-75B1-4539-AA45-47AD106E5DD1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{E6C916B3-F90A-4531-A50E-6A110BC10AA2}"
 EndProject
 Global
