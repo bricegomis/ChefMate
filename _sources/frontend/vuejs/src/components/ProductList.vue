@@ -15,25 +15,27 @@
       <!-- TOP SLOT -->
       <template v-slot:top>
         <div class="row">
-          <div class="col-auto">
+          <div class="col-2">
             <q-input borderless dense debounce="300" v-model="filter" filled>
               <template v-slot:append>
                 <q-icon name="search" color="primary" />
               </template>
             </q-input>
           </div>
-        </div>
-        <div class="row">
-          <q-expansion-item expand-separator icon="filter_list" label="Filters">
-            <q-toggle v-model="selectAllTypes" label="Select All" />
-            <q-toggle
+          <div class="col-10">
+            <q-chip
               v-for="type in types"
-              :key="type"
-              v-model="visibleTypes"
-              :val="type"
-              :label="type"
-            />
-          </q-expansion-item>
+              :key="type.name"
+              v-model:selected="type.isSelected"
+              color="primary"
+              text-color="white"
+            >
+              <!-- <q-badge color="orange" rounded floating>{{
+                type.nbOccurrence
+              }}</q-badge> -->
+              {{ type.name }} ({{ type.nbOccurrence }})
+            </q-chip>
+          </div>
         </div>
       </template>
       <!-- BODY SLOT -->
@@ -47,7 +49,9 @@
             class="cursor-pointer"
           >
             <span class="">{{ props.row.name }}</span>
-            <span class="text-italic text-caption">{{ props.row.comments }}</span>
+            <span class="text-italic text-caption">{{
+              props.row.comments
+            }}</span>
           </q-td>
           <q-td :props="props" key="labels">
             <q-chip
@@ -79,7 +83,20 @@
               </div>
             </q-popup-edit>
           </q-td>
-          <q-td v-for="col in props.cols.slice(2)" :key="col.name" :props="props">
+          <q-td :props="props" key="type">
+            <q-select
+              filled
+              v-model="props.row.type"
+              :options="Object.keys(types)"
+              label="Standard"
+              emit-value
+            />
+          </q-td>
+          <q-td
+            v-for="col in props.cols.slice(2)"
+            :key="col.name"
+            :props="props"
+          >
             {{ col.value }}
           </q-td>
         </q-tr>
@@ -102,7 +119,7 @@
 <script setup lang="ts">
 import { Product } from 'src/models/Product';
 import { useProductStore } from 'src/stores/product-store';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{
   products: Product[];
@@ -191,7 +208,9 @@ const products = props.products.map((product) => {
     : null;
   const storePrices = stores.reduce(
     (acc: { [key: string]: number | null }, store: string) => {
-      const priceItem = product.prices?.find((price) => price.storeName === store);
+      const priceItem = product.prices?.find(
+        (price) => price.storeName === store
+      );
       acc[store] = priceItem ? priceItem.price : null;
       return acc;
     },
@@ -204,21 +223,30 @@ const products = props.products.map((product) => {
   };
 });
 
-const types = computed(() => {
-  return Array.from(new Set(products.flatMap((product) => product.type || [])));
-});
+const types = ref(
+  Object.entries(
+    products.reduce((acc: Record<string, number>, product) => {
+      if (product.type) {
+        acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
+      }
+      return acc;
+    }, {})
+  )
+    .sort((a, b) => b[1] - a[1]) // Sort by occurrences in descending order
+    .map(([name, nbOccurrence]) => ({
+      name,
+      isSelected: ref(true), // Default all types to true as reactive refs
+      nbOccurrence,
+    }))
+);
 
-const visibleTypes = ref(types.value);
-const selectAllTypes = ref(true);
-
-watch(selectAllTypes, (newValue) => {
-  visibleTypes.value = newValue ? types.value : [];
-});
-
-// Filter products based on visibleTypes
+// Filter products based on selected types
 const filteredProducts = computed(() => {
+  const selectedTypes = types.value
+    .filter((type) => type.isSelected)
+    .map((type) => type.name);
   return products.filter(
-    (product) => product.type && visibleTypes.value.includes(product.type)
+    (product) => product.type && selectedTypes.includes(product.type)
   );
 });
 
