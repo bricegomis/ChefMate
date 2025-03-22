@@ -65,34 +65,8 @@
               size="sm"
               icon="delete"
               color="negative"
-              @click="confirmDelete(props.row)"
-            >
-              <q-dialog v-model="confirmDeleteDialog" persistent>
-                <q-card>
-                  <q-card-section class="row items-center">
-                    <q-avatar icon="alert" color="primary" text-color="white" />
-                    <span class="q-ml-sm">Are you sure ?</span>
-                  </q-card-section>
-
-                  <q-card-actions align="right">
-                    <q-btn
-                      flat
-                      label="Ok"
-                      @click="deleteProduct"
-                      color="primary"
-                      v-close-popup
-                    />
-                    <q-btn
-                      flat
-                      label="Cancel"
-                      @click="deletingProduct = null"
-                      color="primary"
-                      v-close-popup
-                    />
-                  </q-card-actions>
-                </q-card>
-              </q-dialog>
-            </q-btn>
+              @click="deleteProduct(props.row)"
+            />
           </q-td>
           <q-td :props="props" key="labels">
             <q-chip
@@ -159,9 +133,12 @@
 </template>
 
 <script setup lang="ts">
+import { useQuasar } from 'quasar';
 import { Product } from 'src/models/Product';
 import { useProductStore } from 'src/stores/product-store';
 import { computed, reactive, ref } from 'vue';
+
+const $q = useQuasar();
 
 const props = defineProps<{
   products: Product[];
@@ -169,18 +146,21 @@ const props = defineProps<{
 
 const filter = ref<string>('');
 
-const confirmDeleteDialog = ref(false);
-const deletingProduct = ref<Product | null>(null);
-
-function confirmDelete(product: Product) {
-  deletingProduct.value = product;
-  confirmDeleteDialog.value = true;
-}
-
-function deleteProduct() {
-  if (!deletingProduct.value) return;
-  const productStore = useProductStore();
-  productStore.deleteProduct(deletingProduct.value);
+function deleteProduct(product: Product) {
+  $q.dialog({
+    title: 'Confirm',
+    message: 'Are you sure',
+    cancel: true,
+    persistent: true,
+  }).onOk(() => {
+    const productStore = useProductStore();
+    productStore.deleteProduct(product);
+    $q.notify({
+      message: 'Product deleted',
+      caption: product.name,
+      color: 'green',
+    });
+  });
 }
 
 const columns = [
@@ -202,7 +182,6 @@ const columns = [
     label: 'Labels',
     field: 'labels',
   },
-  // { name: 'comments', label: 'Comments', field: 'comments', sortable: true },
   { name: 'type', label: 'Type', field: 'type', sortable: true },
   { name: 'tags', label: 'Tags', field: 'tags', sortable: true },
   {
