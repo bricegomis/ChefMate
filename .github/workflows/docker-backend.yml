@@ -3,7 +3,7 @@ name: ChefMate.API Docker Publish
 on:
   push:
     paths:
-      - 'backend/api/**'
+      - '_sources/backend/api/**'
   workflow_dispatch:
 
 jobs:
