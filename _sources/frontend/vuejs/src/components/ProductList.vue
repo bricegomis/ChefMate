@@ -101,11 +101,10 @@
           <q-td :props="props" key="type">
             <q-select
               filled
+              dense
               v-model="props.row.type"
-              :options="types"
-              option-label="name"
-              option-value="name"
-              emit-value
+              :options="types.map((_) => _.name)"
+              options-dense
             />
           </q-td>
           <q-td
@@ -114,17 +113,6 @@
             :props="props"
           >
             {{ col.value }}
-          </q-td>
-        </q-tr>
-        <q-tr v-show="props.expand" :props="props">
-          <q-td colspan="100%">
-            <div class="text-left">
-              <q-table
-                :rows="props.row.prices"
-                row-key="storeName"
-                :columns="subColumns"
-              />
-            </div>
           </q-td>
         </q-tr>
       </template>
@@ -194,29 +182,6 @@ const columns = [
     },
   },
   { name: 'unit', label: 'Unit', field: 'unit', sortable: true },
-];
-const subColumns = [
-  {
-    name: 'store',
-    label: 'Store',
-    field: 'storeName',
-    sortable: true,
-    style: 'width: 80px',
-  },
-  {
-    name: 'price',
-    label: 'Price',
-    field: 'price',
-    sortable: true,
-    style: 'width: 50px',
-  },
-  {
-    name: 'date',
-    label: 'Date',
-    field: 'dateBuying',
-    sortable: true,
-    style: 'width: 100px',
-  },
 ];
 
 // Create the list of stores
