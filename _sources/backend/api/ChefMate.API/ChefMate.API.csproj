@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\common\ChefMate.Models\ChefMate.Models.csproj" />
+    <ProjectReference Include="..\ChefMate.Models\ChefMate.Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>

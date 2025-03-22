@@ -1,5 +1,4 @@
 ﻿using ChefMate.Models;
-using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace ChefMate.API.Services;
@@ -13,10 +12,12 @@ public class MongoDBService : IMongoDBService
     private readonly ILogger _logger;
     private readonly IDateTimeProvider _dateTimeProvider;
 
-    public MongoDBService(ILogger logger,
-                          IDateTimeProvider dateTimeProvider,
-                          string connectionString,
-                          string dbName)
+    public MongoDBService(
+        ILogger logger,
+        IDateTimeProvider dateTimeProvider,
+        string connectionString,
+        string dbName
+    )
     {
         _logger = logger;
         _dateTimeProvider = dateTimeProvider;
