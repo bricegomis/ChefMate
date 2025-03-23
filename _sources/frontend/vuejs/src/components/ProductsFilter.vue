@@ -1,7 +1,7 @@
 <template>
   <div class="row">
     <div class="col-2">
-      <q-input borderless dense debounce="300" v-model="filter" filled>
+      <q-input borderless dense debounce="300" v-model="searchFilter" filled>
         <template v-slot:append>
           <q-icon name="search" color="primary" />
         </template>
@@ -29,15 +29,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed } from 'vue';
 
-const filter = ref<string>('');
 const props = defineProps<{
+  search: string;
   types: {
     name: string;
     isSelected: boolean;
     nbOccurrence: number;
   }[];
+}>();
+
+const searchFilter = computed({
+  get: () => props.search,
+  set: (value: string) => {
+    emit('search', value);
+  },
+});
+
+const emit = defineEmits<{
+  (event: 'search', search: string): void;
 }>();
 
 function toggleType(

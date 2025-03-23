@@ -1,7 +1,11 @@
 <template>
   <q-page title="Products">
     <q-card class="q-pa-md">
-      <ProductsFilter :types="types" />
+      <ProductsFilter
+        :types="types"
+        :search="searchFilter"
+        @search="onSearch"
+      />
     </q-card>
     <ProductList
       v-if="products?.length > 0"
@@ -39,8 +43,14 @@ const products = computed(() => {
   return productStore.products;
 });
 
+const searchFilter = ref<string>('');
+
 const popupDetailOpen = ref(false);
 const editingProduct = ref<Product>();
+
+function onSearch(searchQuery: string) {
+  searchFilter.value = searchQuery;
+}
 
 // Filter products based on selected types
 const filteredProducts = computed(() => {
@@ -48,7 +58,11 @@ const filteredProducts = computed(() => {
     ? products.value.filter(
         (product) =>
           product.type &&
-          selectedTypes.value.map((_) => _.name).includes(product.type)
+          selectedTypes.value.map((_) => _.name).includes(product.type) &&
+          (searchFilter.value.length == 0 ||
+            product.name
+              .toLowerCase()
+              .includes(searchFilter.value.toLowerCase()))
       )
     : [];
 });
