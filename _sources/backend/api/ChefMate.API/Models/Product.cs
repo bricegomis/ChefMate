@@ -14,4 +14,5 @@ public class Product : ModelBase
     public List<PriceItem>? Prices { get; set; }
     public List<string>? Tags { get; set; }
     public string? ProfileId { get; set; }
+    public double? QuantityPerMonth { get; set; }
 }

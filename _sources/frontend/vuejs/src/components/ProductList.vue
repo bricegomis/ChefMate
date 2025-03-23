@@ -21,36 +21,25 @@
           @click="openProduct(props.row)"
           class="cursor-pointer"
         >
-          <span class="">{{ props.row.name }}</span
-          ><br />
-          <span class="text-italic text-caption">{{ props.row.comments }}</span>
-        </q-td>
-        <q-td :props="props" key="actions">
+          <span class="">{{ props.row.name }}</span>
           <q-btn
             flat
             dense
             size="sm"
             icon="delete"
             color="negative"
-            @click="deleteProduct(props.row)"
-          />
+            @click.stop="deleteProduct(props.row)"
+          /><br />
+          <span class="text-italic text-caption text-left">{{
+            props.row.comments
+          }}</span>
         </q-td>
-        <q-td :props="props" key="labels">
-          <q-chip
-            v-for="(label, index) in props.row.labels"
-            :key="index"
-            color="primary"
-            text-color="white"
-            class="q-mr-sm"
-          >
-            {{ label }}
-          </q-chip>
-        </q-td>
+        <q-td :props="props" key="actions"> </q-td>
         <q-td :props="props" key="type">
           {{ props.row.type }}
         </q-td>
-        <q-td v-for="col in props.cols.slice(4)" :key="col.name" :props="props">
-          {{ col.value }}
+        <q-td v-for="col in props.cols.slice(2)" :key="col.name" :props="props">
+          <span>{{ col.value }}</span>
         </q-td>
       </q-tr>
     </template>
@@ -89,29 +78,16 @@ const columns = [
     sortable: true,
     style: 'width: 250px',
   },
-  {
-    name: 'actions',
-    label: '',
-    field: '',
-    sortable: false,
-  },
-  {
-    name: 'labels',
-    label: 'Labels',
-    field: 'labels',
-  },
   { name: 'type', label: 'Type', field: 'type', sortable: true },
-  { name: 'tags', label: 'Tags', field: 'tags', sortable: true },
   {
     name: 'lowestPrice',
-    label: ' BestPrice',
+    label: 'Lowest Price',
     field: 'lowestPrice',
     sortable: true,
-    format: (val: unknown) => {
-      return val ? `${val}€` : 'N/A';
+    format: (val: unknown, row: { unit: string }) => {
+      return val ? `${val}€/${row.unit}` : 'N/A';
     },
   },
-  { name: 'unit', label: 'Unit', field: 'unit', sortable: true },
 ];
 
 // Création des colonnes dynamiquement pour chaque magasin
@@ -120,8 +96,8 @@ const storeColumns = props.stores.map((store) => ({
   label: store,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   field: (row: any) => row.storePrices?.[store] ?? null,
-  format: (val: unknown) => {
-    return val ? `${val}€` : '';
+  format: (val: unknown, row: { unit: string }) => {
+    return val ? `${val}€/${row.unit}` : '-';
   },
   sortable: true,
 }));

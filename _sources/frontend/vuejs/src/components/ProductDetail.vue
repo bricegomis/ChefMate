@@ -16,8 +16,7 @@
             class="absolute-top-right"
             size="sm"
             icon="close"
-          >
-          </q-btn>
+          />
         </q-img>
       </div>
       <q-tab-panels v-model="tab" animated swipeable>
@@ -48,6 +47,7 @@
               input-debounce="0"
               new-value-mode="add-unique"
               :options="types"
+              label="Type"
               options-dense
             />
           </q-card-section>
@@ -77,7 +77,7 @@
           label="prices"
         />
         <q-space />
-        <q-btn icon="save" @click="SaveProduct" />
+        <q-btn flat icon="save" @click="SaveProduct" />
       </q-card-actions>
     </q-card>
   </q-dialog>
