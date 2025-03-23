@@ -64,11 +64,8 @@
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
 import { Product } from 'src/models/Product';
 import { computed } from 'vue';
-
-const $q = useQuasar();
 
 const props = defineProps<{
   filteredProducts: Product[];
@@ -77,21 +74,12 @@ const props = defineProps<{
   stores: string[];
 }>();
 
+const emit = defineEmits<{
+  (event: 'delete-product', product: Product): void;
+}>();
+
 function deleteProduct(product: Product) {
-  $q.dialog({
-    title: 'Confirm',
-    message: 'Are you sure',
-    cancel: true,
-    persistent: true,
-  }).onOk(() => {
-    console.log('Deleted not implemented' + product.name);
-    //productStore.deleteProduct(product);
-    // $q.notify({
-    //   message: 'Product deleted',
-    //   caption: product.name,
-    //   color: 'green',
-    // });
-  });
+  emit('delete-product', product);
 }
 
 const columns = [
