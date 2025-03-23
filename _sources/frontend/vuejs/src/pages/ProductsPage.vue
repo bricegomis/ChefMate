@@ -9,18 +9,27 @@
       :allTypes="types.map((_) => _.name)"
       :selectedTypes="selectedTypes.map((_) => _.name)"
       @delete-product="handleDeleteProduct"
+      @open-product="handleOpenProduct"
       :stores="stores"
+    />
+    <ProductDetail
+      :isOpen="popupDetailOpen"
+      :product="editingProduct || {} as Product"
+      :types="types.map((_) => _.name)"
+      @close="popupDetailOpen = false"
+      @save="saveProduct"
     />
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
 import ProductsFilter from 'src/components/ProductsFilter.vue';
 import ProductList from 'src/components/ProductList.vue';
+import ProductDetail from 'src/components/ProductDetail.vue';
 
+import { useQuasar } from 'quasar';
 import { useProductStore } from 'src/stores/product-store';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { Product } from 'src/models/Product';
 
 const productStore = useProductStore();
@@ -29,6 +38,9 @@ const $q = useQuasar();
 const products = computed(() => {
   return productStore.products;
 });
+
+const popupDetailOpen = ref(false);
+const editingProduct = ref<Product>();
 
 // Filter products based on selected types
 const filteredProducts = computed(() => {
@@ -65,6 +77,21 @@ function handleDeleteProduct(product: Product) {
       color: 'green',
     });
   });
+}
+
+function handleOpenProduct(product: Product) {
+  popupDetailOpen.value = true;
+  editingProduct.value = product;
+}
+
+function saveProduct(product: Product) {
+  productStore.updateProduct(product);
+  $q.notify({
+    caption: 'Product updated successfully',
+    message: product.name,
+    color: 'green',
+  });
+  popupDetailOpen.value = false;
 }
 
 defineOptions({

@@ -18,7 +18,7 @@
         <q-td
           :props="props"
           key="name"
-          @click="props.expand = !props.expand"
+          @click="openProduct(props.row)"
           class="cursor-pointer"
         >
           <span class="">{{ props.row.name }}</span
@@ -47,13 +47,7 @@
           </q-chip>
         </q-td>
         <q-td :props="props" key="type">
-          <q-select
-            filled
-            dense
-            v-model="props.row.type"
-            :options="selectedTypes"
-            options-dense
-          />
+          {{ props.row.type }}
         </q-td>
         <q-td v-for="col in props.cols.slice(4)" :key="col.name" :props="props">
           {{ col.value }}
@@ -76,10 +70,15 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'delete-product', product: Product): void;
+  (event: 'open-product', product: Product): void;
 }>();
 
 function deleteProduct(product: Product) {
   emit('delete-product', product);
+}
+
+function openProduct(product: Product) {
+  emit('open-product', product);
 }
 
 const columns = [

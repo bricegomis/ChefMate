@@ -1,50 +1,127 @@
 <template>
   <q-dialog v-model="isOpen">
     <q-card class="my-card">
-      <q-img src="https://cdn.quasar.dev/img/chicken-salad.jpg" />
-
-      <q-card-section>
-        <q-btn
-          fab
-          color="primary"
-          icon="place"
-          class="absolute"
-          style="top: 0; right: 12px; transform: translateY(-50%)"
-        />
-
-        <div class="row no-wrap items-center">
-          <div class="col text-h6 ellipsis">{{ product.name }}</div>
-          <div
-            class="col-auto text-grey text-caption q-pt-md row no-wrap items-center"
-          >
-            <q-icon name="euro" />
-            {{ lowestPrice }}
+      <div class="relative">
+        <q-img
+          src="https://images.squarespace-cdn.com/content/v1/56801b350e4c11744888ec37/1638140190362-T3SNAJ7RSFSU2VUO9NHA/Carottes+rapee+blue+banner.jpg?format=1500w"
+          :ratio="16 / 9"
+        >
+          <div class="absolute-bottom text-subtitle2 text-center">
+            {{ lowestPrice }} € / {{ product.unit }}
           </div>
-        </div>
+          <q-btn
+            v-close-popup
+            color="primary"
+            rounded
+            class="absolute-top-right"
+            size="sm"
+            icon="close"
+          >
+          </q-btn>
+        </q-img>
+      </div>
+      <q-tab-panels v-model="tab" animated swipeable>
+        <q-tab-panel name="infos">
+          <q-card-section>
+            <div class="row no-wrap items-center">
+              <div class="col text-h6 ellipsis">{{ product.name }}</div>
+              <div
+                class="col-auto text-grey text-caption q-pt-md row no-wrap items-center"
+              ></div>
+            </div>
 
-        <q-rating v-model="stars" :max="5" size="32px" />
-      </q-card-section>
+            <q-rating v-model="stars" :max="5" size="16px" />
+          </q-card-section>
 
-      <q-card-section class="q-pt-none">
-        <div class="text-subtitle1">{{ product.comments }}</div>
-        <div class="text-caption text-grey">
-          Small plates, salads & sandwiches in an intimate setting.
-        </div>
-      </q-card-section>
+          <q-card-section class="q-pt-none">
+            <div class="text-subtitle1"></div>
+            <div class="text-caption text-grey">
+              {{ product.comments }}
+            </div>
+          </q-card-section>
+          <q-card-section>
+            <q-select
+              filled
+              v-model="editingProduct.type"
+              dense
+              use-input
+              input-debounce="0"
+              new-value-mode="add-unique"
+              :options="types"
+              options-dense
+            />
+          </q-card-section>
+        </q-tab-panel>
+        <q-tab-panel name="prices">
+          <q-table
+            :rows="product.prices || []"
+            row-key="storeName"
+            :columns="priceColumns"
+          />
+        </q-tab-panel>
+      </q-tab-panels>
 
       <q-separator />
 
-      <q-card-actions align="right">
-        <q-btn v-close-popup flat color="primary" label="Reserve" />
-        <q-btn v-close-popup flat color="primary" round icon="event" />
+      <q-card-actions align="stretch">
+        <!-- <q-tabs v-model="tab">
+          <q-tab name="infos" icon="infos" label="Infos" />
+          <q-tab name="prices" icon="history" label="Prices" />
+        </q-tabs> -->
+        <q-btn flat @click="tab = 'infos'" color="primary" label="Infos" />
+        <q-btn
+          flat
+          @click="tab = 'prices'"
+          color="primary"
+          round
+          label="prices"
+        />
+        <q-space />
+        <q-btn icon="save" @click="SaveProduct" />
       </q-card-actions>
     </q-card>
   </q-dialog>
-  <!-- <q-table
-                :rows="props.row.prices"
-                row-key="storeName"
-                :columns="subColumns"
-              /> const subColumns = [
+</template>
+
+<script setup lang="ts">
+import { Product } from 'src/models/Product';
+import { computed, ref } from 'vue';
+
+const props = defineProps<{
+  isOpen: boolean;
+  product: Product;
+  types: string[];
+}>();
+
+const editingProduct = computed(() => props.product);
+
+const emit = defineEmits<{
+  (e: 'close', value: boolean): void;
+  (e: 'save', value: Product): void;
+}>();
+
+const isOpen = computed({
+  get: () => props.isOpen,
+  set: (value: boolean) => {
+    emit('close', value);
+  },
+});
+
+const stars = ref(3);
+const tab = ref('infos');
+
+// Calculate this on back
+const lowestPrice = computed(() => {
+  return props.product.prices
+    ? Math.min(...props.product.prices.map((priceItem) => priceItem.price))
+    : null;
+});
+
+function SaveProduct() {
+  emit('save', editingProduct.value);
+}
+
+const priceColumns = [
   {
     name: 'store',
     label: 'Store',
@@ -58,6 +135,9 @@
     field: 'price',
     sortable: true,
     style: 'width: 50px',
+    format: (val: unknown) => {
+      return val ? `${val}€` : '';
+    },
   },
   {
     name: 'date',
@@ -66,28 +146,5 @@
     sortable: true,
     style: 'width: 100px',
   },
-];-->
-</template>
-
-<script setup lang="ts">
-import { Product } from 'src/models/Product';
-import { computed, ref } from 'vue';
-
-const props = defineProps<{
-  isOpen: boolean;
-  product: Product;
-}>();
-
-const isOpen = computed(() => {
-  return props.isOpen;
-});
-
-const stars = ref(3);
-
-// Calculate this on back
-const lowestPrice = computed(() => {
-  return props.product.prices
-    ? Math.min(...props.product.prices.map((priceItem) => priceItem.price))
-    : null;
-});
+];
 </script>
