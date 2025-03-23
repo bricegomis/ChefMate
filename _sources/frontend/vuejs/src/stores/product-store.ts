@@ -1,90 +1,91 @@
 import { defineStore } from 'pinia';
+import { ref, reactive, computed } from 'vue';
 import { Product } from 'src/models/Product';
 import { Profile } from 'src/models/Profile';
 import { api } from 'boot/axios';
-import { reactive } from 'vue';
 
-export const useProductStore = defineStore('ProductStore', {
-  state: () => ({
-    products: [] as Product[],
-    types: [] as {
-      name: string;
-      isSelected: boolean;
-      nbOccurrence: number;
-    }[],
-    profile: {} as Profile,
-    isOnline: false,
-  }),
-  getters: {
-    types: (state) => {
-      Object.entries(
-        state.products.reduce((acc: Record<string, number>, product) => {
-          if (product.type) {
-            acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
-          }
-          return acc;
-        }, {})
+export const useProductStore = defineStore('ProductStore', () => {
+  const products = ref<Product[]>([]);
+  const types = computed(() =>
+    Object.entries(
+      products.value.reduce((acc: Record<string, number>, product) => {
+        if (product.type) {
+          acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
+        }
+        return acc;
+      }, {})
+    )
+      .sort((a, b) => b[1] - a[1]) // Sort by occurrences in descending order
+      .map(([name, nbOccurrence]) =>
+        reactive({
+          name,
+          isSelected: true,
+          nbOccurrence,
+        })
       )
-        .sort((a, b) => b[1] - a[1]) // Sort by occurrences in descending order
-        .map(([name, nbOccurrence]) =>
-          reactive({
-            name,
-            isSelected: true,
-            nbOccurrence,
-          })
-        );
-    },
-  },
-  actions: {
-    async fetchProfile() {
-      try {
-        const response = await api.get('profile');
-        this.isOnline = true;
-        this.profile = response.data;
-      } catch (error) {
-        //console.error('Error fetching profile:', error);
-        this.isOnline = false;
+  );
+  const profile = ref<Profile>();
+  const isOnline = ref(false);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await api.get('profile');
+      isOnline.value = true;
+      profile.value = response.data;
+    } catch (error) {
+      isOnline.value = false;
+    }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const response = await api.get('product/all');
+      products.value = response.data;
+    } catch (error) {
+      console.error('Error fetching Products:', error);
+    }
+  };
+
+  const createProduct = async (product: Product) => {
+    try {
+      await api.post('product', product);
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error creating Product:', error);
+    }
+  };
+
+  const updateProduct = async (product: Product) => {
+    try {
+      if (product.id) {
+        await api.put('product', product);
+      } else {
+        await api.post('Product', product);
       }
-    },
-    async fetchProducts() {
-      try {
-        const response = await api.get('product/all');
-        this.products = response.data;
-      } catch (error) {
-        //console.error('Error fetching Products:', error);
-      }
-    },
-    async createProduct(product: Product) {
-      try {
-        await api.post('product', product);
-        await this.fetchProducts();
-      } catch (error) {
-        console.error('Error creating Product:', error);
-      }
-    },
-    async updateProduct(product: Product) {
-      try {
-        if (product.id)
-          // TODO use product ?
-          // => editing
-          await api.put('product', product);
-        // => new
-        else await api.post('Product', product);
-        await this.fetchProducts();
-      } catch (error) {
-        console.error('Error when editing a product :', error);
-      }
-    },
-    async deleteProduct(product: Product) {
-      try {
-        await api.delete(`product/${product.id}`);
-        await this.fetchProducts();
-      } catch (error) {
-        console.error('Error deleting Product:', error);
-      }
-    },
-  },
-  persist: {
-    enabled: true,
-  },
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error when editing a product:', error);
+    }
+  };
+
+  const deleteProduct = async (product: Product) => {
+    try {
+      await api.delete(`product/${product.id}`);
+      await fetchProducts();
+    } catch (error) {
+      console.error('Error deleting Product:', error);
+    }
+  };
+
+  return {
+    products,
+    types,
+    profile,
+    isOnline,
+    fetchProfile,
+    fetchProducts,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+  };
 });

@@ -240,7 +240,7 @@ function toggleType(
   if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
     selectedType.isSelected = !selectedType.isSelected;
   } else {
-    types.value.forEach((type) => {
+    productStore.types.forEach((type) => {
       type.isSelected = type == selectedType;
     });
   }
@@ -248,7 +248,7 @@ function toggleType(
 
 // Filter products based on selected types
 const filteredProducts = computed(() => {
-  const selectedTypes = types.value
+  const selectedTypes = productStore.types
     .filter((type) => type.isSelected)
     .map((type) => type.name);
   return selectedTypes.length
