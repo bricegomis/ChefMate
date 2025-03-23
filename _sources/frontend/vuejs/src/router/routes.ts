@@ -12,36 +12,17 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/ProductsPage.vue'),
         meta: { transition: 'slide-left' },
       },
-      {
-        path: 'product/:id',
-        name: 'product',
-        component: () => import('pages/ProductPage.vue'),
-        meta: { transition: 'slide-right' },
-      },
     ],
   },
   {
-    path: '/scanner',
-    name: 'Scanner',
+    path: '/chatgpt',
+    name: 'Chatgpt',
     component: () => import('layouts/MainLayout.vue'),
     children: [
       {
-        path: '/scanner',
-        name: 'scanner',
-        component: () => import('pages/ScannerPage.vue'),
-        meta: { transition: 'slide-left' },
-      },
-    ],
-  },
-  {
-    path: '/stats',
-    name: 'Stats',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [
-      {
-        path: '/stats',
-        name: 'stats',
-        component: () => import('pages/StatsPage.vue'),
+        path: '/chatgpt',
+        name: 'chatgpt',
+        component: () => import('pages/ChatGptPage.vue'),
         meta: { transition: 'slide-left' },
       },
     ],

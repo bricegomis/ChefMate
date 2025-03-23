@@ -24,7 +24,7 @@
           </div>
           <div class="col-10">
             <q-btn
-              v-for="type in types"
+              v-for="type in productStore.types"
               :key="type.name"
               :outline="!type.isSelected"
               square
@@ -103,7 +103,7 @@
               filled
               dense
               v-model="props.row.type"
-              :options="types.map((_) => _.name)"
+              :options="productStore.types.map((_) => _.name)"
               options-dense
             />
           </q-td>
@@ -124,9 +124,10 @@
 import { useQuasar } from 'quasar';
 import { Product } from 'src/models/Product';
 import { useProductStore } from 'src/stores/product-store';
-import { computed, reactive, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const $q = useQuasar();
+const productStore = useProductStore();
 
 const props = defineProps<{
   products: Product[];
@@ -141,7 +142,6 @@ function deleteProduct(product: Product) {
     cancel: true,
     persistent: true,
   }).onOk(() => {
-    const productStore = useProductStore();
     productStore.deleteProduct(product);
     $q.notify({
       message: 'Product deleted',
@@ -231,25 +231,6 @@ const products = computed(() => {
   });
 });
 
-const types = ref(
-  Object.entries(
-    products.value.reduce((acc: Record<string, number>, product) => {
-      if (product.type) {
-        acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
-      }
-      return acc;
-    }, {})
-  )
-    .sort((a, b) => b[1] - a[1]) // Sort by occurrences in descending order
-    .map(([name, nbOccurrence]) =>
-      reactive({
-        name,
-        isSelected: ref<boolean>(true),
-        nbOccurrence,
-      })
-    )
-);
-
 // Function to toggle the selection of a type
 function toggleType(
   selectedType: { name: string; isSelected: boolean },
@@ -282,7 +263,7 @@ const newLabel = ref<string>('');
 function removeLabel(product: Product, label: string) {
   if (product.labels) {
     product.labels = product.labels.filter((l) => l !== label);
-    useProductStore().updateProduct(product);
+    productStore.updateProduct(product);
   }
 }
 

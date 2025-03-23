@@ -2,15 +2,39 @@ import { defineStore } from 'pinia';
 import { Product } from 'src/models/Product';
 import { Profile } from 'src/models/Profile';
 import { api } from 'boot/axios';
+import { reactive } from 'vue';
 
 export const useProductStore = defineStore('ProductStore', {
   state: () => ({
     products: [] as Product[],
-    isEditingProductDialogVisible: false,
-    editingProduct: {} as Product,
+    types: [] as {
+      name: string;
+      isSelected: boolean;
+      nbOccurrence: number;
+    }[],
     profile: {} as Profile,
     isOnline: false,
   }),
+  getters: {
+    types: (state) => {
+      Object.entries(
+        state.products.reduce((acc: Record<string, number>, product) => {
+          if (product.type) {
+            acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
+          }
+          return acc;
+        }, {})
+      )
+        .sort((a, b) => b[1] - a[1]) // Sort by occurrences in descending order
+        .map(([name, nbOccurrence]) =>
+          reactive({
+            name,
+            isSelected: true,
+            nbOccurrence,
+          })
+        );
+    },
+  },
   actions: {
     async fetchProfile() {
       try {
@@ -28,14 +52,6 @@ export const useProductStore = defineStore('ProductStore', {
         this.products = response.data;
       } catch (error) {
         //console.error('Error fetching Products:', error);
-      }
-    },
-    async getProduct(id: string) {
-      try {
-        const response = await api.get(`product/${id}`);
-        this.editingProduct = response.data; //TODO check if it's the right name
-      } catch (error) {
-        console.error('Error fetching Product:', error);
       }
     },
     async createProduct(product: Product) {
@@ -65,14 +81,6 @@ export const useProductStore = defineStore('ProductStore', {
         await this.fetchProducts();
       } catch (error) {
         console.error('Error deleting Product:', error);
-      }
-    },
-    async finishProduct(product: Product) {
-      try {
-        await api.put('product/finish', product);
-        await this.fetchProducts();
-      } catch (error) {
-        console.error('Error when finishing a product :', error);
       }
     },
   },
