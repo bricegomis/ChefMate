@@ -5,6 +5,8 @@ import { Profile } from 'src/models/Profile';
 import { api } from 'boot/axios';
 
 export const useProductStore = defineStore('ProductStore', () => {
+  const profile = ref<Profile>();
+  const isOnline = ref(false);
   const products = ref<Product[]>([]);
   const types = computed(() =>
     Object.entries(
@@ -24,8 +26,16 @@ export const useProductStore = defineStore('ProductStore', () => {
         })
       )
   );
-  const profile = ref<Profile>();
-  const isOnline = ref(false);
+  // Create the list of stores
+  const stores = computed(() =>
+    Array.from(
+      new Set(
+        products.value.flatMap(
+          (product) => product.prices?.map((price) => price.storeName) || []
+        )
+      )
+    )
+  );
 
   const fetchProfile = async () => {
     try {
@@ -80,6 +90,7 @@ export const useProductStore = defineStore('ProductStore', () => {
   return {
     products,
     types,
+    stores,
     profile,
     isOnline,
     fetchProfile,

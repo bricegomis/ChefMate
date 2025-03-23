@@ -1,139 +1,81 @@
 <template>
-  <div class="q-pa-md">
-    <q-table
-      class="my-sticky-header-column-table"
-      :columns="allColumns"
-      :rows="filteredProducts"
-      row-key="id"
-      separator="cell"
-      flat
-      bordered
-      dense
-      title="Produits"
-      :rows-per-page-options="[20, 50, 100]"
-    >
-      <!-- TOP SLOT -->
-      <template v-slot:top>
-        <div class="row">
-          <div class="col-2">
-            <q-input borderless dense debounce="300" v-model="filter" filled>
-              <template v-slot:append>
-                <q-icon name="search" color="primary" />
-              </template>
-            </q-input>
-          </div>
-          <div class="col-10">
-            <q-btn
-              v-for="type in productStore.types"
-              :key="type.name"
-              :outline="!type.isSelected"
-              square
-              size="sm"
-              class="q-ma-xs"
-              color="green"
-              @click="toggleType(type, $event)"
-              :text-color="type.isSelected ? 'white' : 'black'"
-            >
-              <span class="">{{ type.name }}</span>
-              <span class="text-italic text-weight-thin"
-                >&nbsp; ({{ type.nbOccurrence }})</span
-              >
-            </q-btn>
-          </div>
-        </div>
-      </template>
-      <!-- BODY SLOT -->
-      <template v-slot:body="props">
-        <q-tr :props="props">
-          <!-- NAME -->
-          <q-td
-            :props="props"
-            key="name"
-            @click="props.expand = !props.expand"
-            class="cursor-pointer"
+  <q-table
+    class="my-sticky-header-column-table"
+    :columns="allColumns"
+    :rows="productsWithMeta"
+    row-key="id"
+    separator="cell"
+    flat
+    bordered
+    dense
+    title="Produits"
+    :rows-per-page-options="[20, 50, 100]"
+  >
+    <!-- BODY SLOT -->
+    <template v-slot:body="props">
+      <q-tr :props="props">
+        <!-- NAME -->
+        <q-td
+          :props="props"
+          key="name"
+          @click="props.expand = !props.expand"
+          class="cursor-pointer"
+        >
+          <span class="">{{ props.row.name }}</span
+          ><br />
+          <span class="text-italic text-caption">{{ props.row.comments }}</span>
+        </q-td>
+        <q-td :props="props" key="actions">
+          <q-btn
+            flat
+            dense
+            size="sm"
+            icon="delete"
+            color="negative"
+            @click="deleteProduct(props.row)"
+          />
+        </q-td>
+        <q-td :props="props" key="labels">
+          <q-chip
+            v-for="(label, index) in props.row.labels"
+            :key="index"
+            color="primary"
+            text-color="white"
+            class="q-mr-sm"
           >
-            <span class="">{{ props.row.name }}</span
-            ><br />
-            <span class="text-italic text-caption">{{
-              props.row.comments
-            }}</span>
-          </q-td>
-          <q-td :props="props" key="actions">
-            <q-btn
-              flat
-              dense
-              size="sm"
-              icon="delete"
-              color="negative"
-              @click="deleteProduct(props.row)"
-            />
-          </q-td>
-          <q-td :props="props" key="labels">
-            <q-chip
-              v-for="(label, index) in props.row.labels"
-              :key="index"
-              color="primary"
-              text-color="white"
-              class="q-mr-sm"
-            >
-              {{ label }}
-            </q-chip>
-            <q-popup-edit v-model="props.row.labels" v-slot="scope">
-              <div class="q-pa-sm">
-                <q-chip
-                  v-for="(label, index) in scope.value"
-                  :key="index"
-                  removable
-                  @remove="removeLabel(props.row, label)"
-                  class="q-mr-sm"
-                >
-                  {{ label }}
-                </q-chip>
-                <q-input
-                  v-model="newLabel"
-                  dense
-                  placeholder="Add label"
-                  @keyup.enter="addLabel(scope)"
-                />
-              </div>
-            </q-popup-edit>
-          </q-td>
-          <q-td :props="props" key="type">
-            <q-select
-              filled
-              dense
-              v-model="props.row.type"
-              :options="productStore.types.map((_) => _.name)"
-              options-dense
-            />
-          </q-td>
-          <q-td
-            v-for="col in props.cols.slice(4)"
-            :key="col.name"
-            :props="props"
-          >
-            {{ col.value }}
-          </q-td>
-        </q-tr>
-      </template>
-    </q-table>
-  </div>
+            {{ label }}
+          </q-chip>
+        </q-td>
+        <q-td :props="props" key="type">
+          <q-select
+            filled
+            dense
+            v-model="props.row.type"
+            :options="selectedTypes"
+            options-dense
+          />
+        </q-td>
+        <q-td v-for="col in props.cols.slice(4)" :key="col.name" :props="props">
+          {{ col.value }}
+        </q-td>
+      </q-tr>
+    </template>
+  </q-table>
 </template>
 
 <script setup lang="ts">
 import { useQuasar } from 'quasar';
 import { Product } from 'src/models/Product';
-import { useProductStore } from 'src/stores/product-store';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 const $q = useQuasar();
-const productStore = useProductStore();
 
 const props = defineProps<{
-  products: Product[];
+  filteredProducts: Product[];
+  allTypes: string[];
+  selectedTypes: string[];
+  stores: string[];
 }>();
-
-const filter = ref<string>('');
 
 function deleteProduct(product: Product) {
   $q.dialog({
@@ -142,12 +84,13 @@ function deleteProduct(product: Product) {
     cancel: true,
     persistent: true,
   }).onOk(() => {
-    productStore.deleteProduct(product);
-    $q.notify({
-      message: 'Product deleted',
-      caption: product.name,
-      color: 'green',
-    });
+    console.log('Deleted not implemented' + product.name);
+    //productStore.deleteProduct(product);
+    // $q.notify({
+    //   message: 'Product deleted',
+    //   caption: product.name,
+    //   color: 'green',
+    // });
   });
 }
 
@@ -184,17 +127,8 @@ const columns = [
   { name: 'unit', label: 'Unit', field: 'unit', sortable: true },
 ];
 
-// Create the list of stores
-const stores = Array.from(
-  new Set(
-    props.products.flatMap(
-      (product) => product.prices?.map((price) => price.storeName) || []
-    )
-  )
-);
-
 // Création des colonnes dynamiquement pour chaque magasin
-const storeColumns = stores.map((store) => ({
+const storeColumns = props.stores.map((store) => ({
   name: store,
   label: store,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -208,12 +142,12 @@ const storeColumns = stores.map((store) => ({
 // Ajout des colonnes des magasins aux colonnes existantes
 const allColumns = [...columns, ...storeColumns];
 
-const products = computed(() => {
-  return props.products.map((product) => {
+const productsWithMeta = computed(() => {
+  return props.filteredProducts.map((product) => {
     const lowestPrice = product.prices
       ? Math.min(...product.prices.map((priceItem) => priceItem.price))
       : null;
-    const storePrices = stores.reduce(
+    const storePrices = props.stores.reduce(
       (acc: { [key: string]: number | null }, store: string) => {
         const priceItem = product.prices?.find(
           (price) => price.storeName === store
@@ -230,51 +164,8 @@ const products = computed(() => {
     };
   });
 });
-
-// Function to toggle the selection of a type
-function toggleType(
-  selectedType: { name: string; isSelected: boolean },
-  event: Event
-) {
-  const mouseEvent = event as MouseEvent;
-  if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
-    selectedType.isSelected = !selectedType.isSelected;
-  } else {
-    productStore.types.forEach((type) => {
-      type.isSelected = type == selectedType;
-    });
-  }
-}
-
-// Filter products based on selected types
-const filteredProducts = computed(() => {
-  const selectedTypes = productStore.types
-    .filter((type) => type.isSelected)
-    .map((type) => type.name);
-  return selectedTypes.length
-    ? products.value.filter(
-        (product) => product.type && selectedTypes.includes(product.type)
-      )
-    : [];
-});
-
-const newLabel = ref<string>('');
-
-function removeLabel(product: Product, label: string) {
-  if (product.labels) {
-    product.labels = product.labels.filter((l) => l !== label);
-    productStore.updateProduct(product);
-  }
-}
-
-// Fonction pour ajouter un label
-function addLabel(scope: { value: string[] }) {
-  if (newLabel.value.trim() && !scope.value.includes(newLabel.value.trim())) {
-    scope.value.push(newLabel.value.trim());
-    newLabel.value = '';
-  }
-}
 </script>
+
 <style lang="sass">
 .my-sticky-header-column-table
   td:first-child
