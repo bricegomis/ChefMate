@@ -7,6 +7,7 @@ public class MongoDBService : IMongoDBService
 {
     private readonly IMongoCollection<Product> _productCollection;
     private readonly IMongoCollection<Profile> _profileCollection;
+    private readonly IMongoCollection<Profile> _receipeCollection;
     private readonly MongoClient _client;
 
     private readonly ILogger _logger;
@@ -25,34 +26,23 @@ public class MongoDBService : IMongoDBService
 
         string productCollectionName = "Ingredients";
         string profileCollectionName = "Profiles";
+        string receipesCollectionName = "Receipes";
 
         var database = _client.GetDatabase(dbName);
         _productCollection = database.GetCollection<Product>(productCollectionName);
         _profileCollection = database.GetCollection<Profile>(profileCollectionName);
+        _receipeCollection = database.GetCollection<Profile>(receipesCollectionName);
     }
 
     public async Task CustomMethod(string profileId)
     {
-        var list = await _productCollection.Find(_ => true).ToListAsync();
-        foreach (var product in list)
-        {
-            var priceItem = product.Prices?.Where(_ => _.StoreName == "Quantié / mois").FirstOrDefault();
-            var quantityPerMonth = priceItem?.Price ?? 0;
-            product.QuantityPerMonth = quantityPerMonth;
-            if (priceItem != null)
-                product.Prices?.Remove(priceItem);
-            await _productCollection.ReplaceOneAsync(_ => _.Id == product.Id, product);
-        }
+        var updateDefinition = Builders<Product>.Update.Set(product => product.ProfileId, profileId)
+            .Set(_ => _.IsDeleted, false);
 
-        
-
-        //var updateDefinition = Builders<Product>.Update.Set(product => product.ProfileId, profileId)
-        //    .Set(_ => _.IsDeleted, false);
-
-        //var result = await _productCollection.UpdateManyAsync(
-        //    filter: Builders<Product>.Filter.Empty,
-        //    update: updateDefinition
-        //);
+        var result = await _productCollection.UpdateManyAsync(
+            filter: Builders<Product>.Filter.Empty,
+            update: updateDefinition
+        );
     }
 
     public async Task<List<Product>> GetAllProducts(string profileId)
