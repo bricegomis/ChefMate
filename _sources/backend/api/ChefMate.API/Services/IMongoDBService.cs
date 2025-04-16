@@ -1,4 +1,4 @@
-using ChefMate.Models;
+using ChefMate.API.Models;
 
 namespace ChefMate.API.Services;
 

@@ -1,4 +1,4 @@
-﻿using ChefMate.Models;
+﻿using ChefMate.API.Models;
 using MongoDB.Driver;
 
 namespace ChefMate.API.Services;

@@ -1,9 +1,9 @@
 namespace ChefMate.API.Manager;
 
-using ChefMate.Models;
 using ChefMate.API.Services;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using ChefMate.API.Models;
 
 public class ProductManager(ILogger logger,
                                IMongoDBService mongoDBService,

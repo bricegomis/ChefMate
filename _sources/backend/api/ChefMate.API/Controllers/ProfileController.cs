@@ -1,5 +1,5 @@
 ﻿using ChefMate.API.Manager;
-using ChefMate.Models;
+using ChefMate.API.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 

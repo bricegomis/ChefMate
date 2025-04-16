@@ -1,6 +1,6 @@
-﻿using ChefMate.Models;
-using ChefMate.API.Services;
+﻿using ChefMate.API.Services;
 using MongoDB.Bson;
+using ChefMate.API.Models;
 
 namespace ChefMate.API.Manager;
 

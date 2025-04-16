@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 
-namespace ChefMate.Models;
+namespace ChefMate.API.Models;
 
 [BsonIgnoreExtraElements]
 public class PriceItem : ModelBase

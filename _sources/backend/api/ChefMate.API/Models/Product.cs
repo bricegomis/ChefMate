@@ -1,7 +1,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace ChefMate.Models;
+namespace ChefMate.API.Models;
 
 [BsonIgnoreExtraElements]
 public class Product : ModelBase
