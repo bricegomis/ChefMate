@@ -35,8 +35,8 @@
           }}</span>
         </q-td>
         <q-td :props="props" key="actions"> </q-td>
-        <q-td :props="props" key="type">
-          {{ props.row.type }}
+        <q-td :props="props" key="tags">
+          {{ props.row.tags.join(', ') }}
         </q-td>
         <q-td v-for="col in props.cols.slice(2)" :key="col.name" :props="props">
           <span>{{ col.value }}</span>
@@ -78,7 +78,7 @@ const columns = [
     sortable: true,
     style: 'width: 250px',
   },
-  { name: 'type', label: 'Type', field: 'type', sortable: true },
+  { name: 'tags', label: 'Tags', field: 'tags', sortable: true },
   {
     name: 'lowestPrice',
     label: 'Lowest Price',

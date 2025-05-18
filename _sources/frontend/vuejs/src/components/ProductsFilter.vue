@@ -9,19 +9,19 @@
     </div>
     <div class="col-10">
       <q-btn
-        v-for="type in props.types"
-        :key="type.name"
-        :outline="!type.isSelected"
+        v-for="tag in props.tags"
+        :key="tag.name"
+        :outline="!tag.isSelected"
         square
         size="sm"
         class="q-ma-xs"
         color="green"
-        @click="toggleType(type, $event)"
-        :text-color="type.isSelected ? 'white' : 'black'"
+        @click="toggleType(tag, $event)"
+        :text-color="tag.isSelected ? 'white' : 'black'"
       >
-        <span class="">{{ type.name }}</span>
+        <span class="">{{ tag.name }}</span>
         <span class="text-italic text-weight-thin"
-          >&nbsp; ({{ type.nbOccurrence }})</span
+          >&nbsp; ({{ tag.nbOccurrence }})</span
         >
       </q-btn>
     </div>
@@ -33,7 +33,7 @@ import { computed } from 'vue';
 
 const props = defineProps<{
   search: string;
-  types: {
+  tags: {
     name: string;
     isSelected: boolean;
     nbOccurrence: number;
@@ -52,15 +52,15 @@ const emit = defineEmits<{
 }>();
 
 function toggleType(
-  selectedType: { name: string; isSelected: boolean },
+  selectedTag: { name: string; isSelected: boolean },
   event: Event
 ) {
   const mouseEvent = event as MouseEvent;
   if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
-    selectedType.isSelected = !selectedType.isSelected;
+    selectedTag.isSelected = !selectedTag.isSelected;
   } else {
-    props.types.forEach((type) => {
-      type.isSelected = type == selectedType;
+    props.tags.forEach((tag) => {
+      tag.isSelected = tag == selectedTag;
     });
   }
 }

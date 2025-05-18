@@ -2,7 +2,8 @@
   <q-page title="Products">
     <q-card class="q-pa-md">
       <ProductsFilter
-        :types="types"
+        :tags="tags"
+        :usages="Object.values(ProductUsageType)"
         :search="searchFilter"
         @search="onSearch"
       />
@@ -10,8 +11,8 @@
     <ProductList
       v-if="products?.length > 0"
       :filteredProducts="filteredProducts"
-      :allTypes="types.map((_) => _.name)"
-      :selectedTypes="selectedTypes.map((_) => _.name)"
+      :allTypes="tags.map((_) => _.name)"
+      :selectedTypes="selectedTags.map((_) => _.name)"
       @delete-product="handleDeleteProduct"
       @open-product="handleOpenProduct"
       :stores="stores"
@@ -19,7 +20,7 @@
     <ProductDetail
       :isOpen="popupDetailOpen"
       :product="editingProduct || {} as Product"
-      :types="types.map((_) => _.name)"
+      :types="tags.map((_) => _.name)"
       @close="popupDetailOpen = false"
       @save="saveProduct"
     />
@@ -30,6 +31,7 @@
 import ProductsFilter from 'src/components/ProductsFilter.vue';
 import ProductList from 'src/components/ProductList.vue';
 import ProductDetail from 'src/components/ProductDetail.vue';
+import { ProductUsageType } from 'src/models/ProductUsageType';
 
 import { useQuasar } from 'quasar';
 import { useProductStore } from 'src/stores/product-store';
@@ -69,11 +71,11 @@ const filteredProducts = computed(() => {
     */
 });
 
-const types = computed(() => {
-  return productStore.types;
+const tags = computed(() => {
+  return productStore.tags;
 });
 
-const selectedTypes = computed(() => types.value.filter((_) => _.isSelected));
+const selectedTags = computed(() => tags.value.filter((_) => _.isSelected));
 
 const stores = computed(() => {
   return productStore.stores;

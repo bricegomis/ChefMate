@@ -8,12 +8,12 @@ export const useProductStore = defineStore('ProductStore', () => {
   const profile = ref<Profile>();
   const isOnline = ref(false);
   const products = ref<Product[]>([]);
-  const types = computed(() =>
+  const tags = computed(() =>
     Object.entries(
       products.value.reduce((acc: Record<string, number>, product) => {
-        // if (product.type) {
-        //   acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
-        // }
+        for (const tag of product.tags || []) {
+          acc[tag] = (acc[tag] || 0) + 1; // Count occurrences
+        }
         return acc;
       }, {})
     )
@@ -89,7 +89,7 @@ export const useProductStore = defineStore('ProductStore', () => {
 
   return {
     products,
-    types,
+    tags,
     stores,
     profile,
     isOnline,
