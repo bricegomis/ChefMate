@@ -1,4 +1,6 @@
 ﻿using ChefMate.API.Models.Documents;
+using ChefMate.API.Models.Documents.Interfaces;
+using ChefMate.API.Services;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 
@@ -18,12 +20,28 @@ public class ProductRepository : IProductRepository
 {
     private readonly IAsyncDocumentSession _session;
     private readonly IDocumentStore _store;
+    private readonly IDateTimeService _dateTimeService;
 
-    public ProductRepository(IAsyncDocumentSession session,
-        IDocumentStore store)
+    public ProductRepository(
+        IAsyncDocumentSession session,
+        IDocumentStore store,
+        IDateTimeService dateTimeService)
     {
         _session = session;
         _store = store;
+        _dateTimeService = dateTimeService;
+
+        _store.OnBeforeStore += (sender, args) =>
+        {
+            if (args.Entity is IDateTracked dateTracked)
+            {
+                if (string.IsNullOrEmpty(args.DocumentId))
+                {
+                    dateTracked.DateCreated = _dateTimeService.GetNow();
+                }
+                dateTracked.DateModified = _dateTimeService.GetNow();
+            }
+        };
     }
 
     public async Task AddAsync(ProductDocument product)
