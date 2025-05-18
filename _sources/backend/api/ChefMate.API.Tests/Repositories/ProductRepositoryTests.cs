@@ -12,11 +12,9 @@ namespace ChefMate.API.Tests.Repositories;
 public class ProductRepositoryTests
 {
     private readonly Mock<IAsyncDocumentSession> _sessionMock = new();
-    private readonly Mock<IDocumentStore> _storeMock = new();
-    private readonly Mock<IDateTimeService> _dateTimeServiceMock = new();
 
     private ProductRepository CreateRepo()
-        => new(_sessionMock.Object, _storeMock.Object, _dateTimeServiceMock.Object);
+        => new(_sessionMock.Object);
 
     [Fact]
     public async Task AddAsync_Stores_And_Saves()

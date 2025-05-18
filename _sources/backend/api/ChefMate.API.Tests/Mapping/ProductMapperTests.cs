@@ -1,6 +1,7 @@
 using ChefMate.API.Mapping;
 using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Dto;
+using ChefMate.API.Models.Dto.Product;
 using ChefMate.API.Models.Enums;
 using FluentAssertions;
 

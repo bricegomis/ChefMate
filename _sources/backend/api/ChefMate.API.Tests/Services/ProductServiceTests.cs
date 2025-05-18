@@ -1,6 +1,7 @@
 using ChefMate.API.Mapping.Interfaces;
 using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Dto;
+using ChefMate.API.Models.Dto.Product;
 using ChefMate.API.Repositories;
 using ChefMate.API.Services;
 using ChefMate.API.Services.Interfaces;
