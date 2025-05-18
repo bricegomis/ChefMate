@@ -32,7 +32,9 @@ public class ProductController(ILogger<ProductController> logger,
         if (string.IsNullOrEmpty(userEmail))
             return Unauthorized();
 
-        var products = await _service.GetAllAsync(userEmail);
+        var profileId = $"profiles/{userEmail}";
+
+        var products = await _service.GetAllAsync(profileId);
         var dtos = _mapper.ToDtoList(products);
         return Ok(dtos);
     }

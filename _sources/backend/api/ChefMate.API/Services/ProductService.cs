@@ -1,4 +1,5 @@
-﻿using ChefMate.API.Models.Documents;
+﻿using ChefMate.API.Attributes;
+using ChefMate.API.Models.Documents;
 using ChefMate.API.Repositories;
 
 namespace ChefMate.API.Services;
@@ -13,6 +14,7 @@ public interface IProductService
     Task DeleteAsync(string id);
 }
 
+[Injectable]
 public class ProductService : IProductService
 {
     private readonly IProductRepository _repository;

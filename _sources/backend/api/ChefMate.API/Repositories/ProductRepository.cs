@@ -1,4 +1,5 @@
-﻿using ChefMate.API.Models.Documents;
+﻿using ChefMate.API.Attributes;
+using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Documents.Interfaces;
 using ChefMate.API.Services;
 using Raven.Client.Documents;
@@ -16,6 +17,7 @@ public interface IProductRepository
     Task BulkInsertAsync(IEnumerable<ProductDocument> products);
 }
 
+[Injectable]
 public class ProductRepository : IProductRepository
 {
     private readonly IAsyncDocumentSession _session;

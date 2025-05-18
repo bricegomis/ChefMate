@@ -1,12 +1,10 @@
+using ChefMate.API.Extensions;
 using ChefMate.API.Models.Documents;
-using ChefMate.API.Repositories;
-using ChefMate.API.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Conventions;
-using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -31,11 +29,11 @@ public class Startup(IConfiguration configuration)
         });
 
         services.AddControllers()
-        .AddJsonOptions(options =>
-         {
-             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-             options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-         });
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
@@ -66,10 +64,37 @@ public class Startup(IConfiguration configuration)
             c.OperationFilter<AuthorizeCheckOperationFilter>();
 
         });
+        
+        RegisterRavenDb(services);
 
-        var loggerFactory = LoggerFactory.Create(builder => builder.AddSerilog(Log.Logger));
-        var datetimeProvider = new DateTimeService();
+        services.AddAttributedServices();
 
+        var key = Encoding.UTF8.GetBytes(configuration["AuthSettings:JwtKey"]);
+
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = configuration["AuthSettings:JwtIssuer"],
+                ValidAudience = configuration["AuthSettings:JwtAudience"],
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
+        });
+
+        services.AddAuthorization();
+    }
+
+    private void RegisterRavenDb(IServiceCollection services)
+    {
         var ravenDbServer = Configuration["RavenDB_Server"];
         var ravenDbName = Configuration["RavenDB_DbName"];
         var ravenDbCertBase64 = configuration["RavenDB_CertificateBase64"];
@@ -104,32 +129,6 @@ public class Startup(IConfiguration configuration)
             var store = sp.GetRequiredService<IDocumentStore>();
             return store.OpenAsyncSession();
         });
-
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IProductService, ProductService>();
-
-        var key = Encoding.UTF8.GetBytes(configuration["AuthSettings:JwtKey"]);
-
-        services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["AuthSettings:JwtIssuer"],
-                ValidAudience = configuration["AuthSettings:JwtAudience"],
-                IssuerSigningKey = new SymmetricSecurityKey(key)
-            };
-        });
-
-        services.AddAuthorization();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
