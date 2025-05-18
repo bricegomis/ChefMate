@@ -55,7 +55,7 @@ import { computed } from 'vue';
 const props = defineProps<{
   filteredProducts: Product[];
   allTypes: string[];
-  selectedTypes: string[];
+  selectedTags: string[];
   stores: string[];
 }>();
 

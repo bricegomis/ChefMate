@@ -12,7 +12,7 @@
       v-if="products?.length > 0"
       :filteredProducts="filteredProducts"
       :allTypes="tags.map((_) => _.name)"
-      :selectedTypes="selectedTags.map((_) => _.name)"
+      :selectedTags="selectedTags.map((_) => _.name)"
       @delete-product="handleDeleteProduct"
       @open-product="handleOpenProduct"
       :stores="stores"
@@ -54,21 +54,21 @@ function onSearch(searchQuery: string) {
   searchFilter.value = searchQuery;
 }
 
-// Filter products based on selected types
+// Filter products based on selected tags
 const filteredProducts = computed(() => {
-  return products.value;
-  /*  return selectedTypes.value.length
+  return selectedTags.value.length
     ? products.value.filter(
         (product) =>
-          product.type &&
-          selectedTypes.value.map((_) => _.name).includes(product.type) &&
-          (searchFilter.value.length == 0 ||
+          product.tags &&
+          product.tags.some((tag) =>
+            selectedTags.value.map((_) => _.name).includes(tag)
+          ) &&
+          (searchFilter.value.length === 0 ||
             product.name
               .toLowerCase()
               .includes(searchFilter.value.toLowerCase()))
       )
     : [];
-    */
 });
 
 const tags = computed(() => {

@@ -2,7 +2,7 @@
   <q-dialog v-model="isOpen">
     <q-card class="my-card">
       <div class="relative">
-        <q-img :src="product.image ?? ''" :ratio="16 / 9" width="600px">
+        <q-img :src="product.image ?? ''" :ratio="16 / 9" width="500px">
           <div class="absolute-bottom text-subtitle2 text-center">
             {{ lowestPrice }} € /
           </div>
