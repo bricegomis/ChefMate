@@ -4,7 +4,7 @@
       <div class="relative">
         <q-img :src="product.image ?? ''" :ratio="16 / 9" width="600px">
           <div class="absolute-bottom text-subtitle2 text-center">
-            {{ lowestPrice }} € / {{ product.unit }}
+            {{ lowestPrice }} € /
           </div>
           <q-btn
             v-close-popup

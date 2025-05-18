@@ -47,7 +47,9 @@
 </template>
 
 <script setup lang="ts">
+import { PriceItem } from 'src/models/PriceItem';
 import { Product } from 'src/models/Product';
+import { ProductQuantityUnit } from 'src/models/ProductQuantityUnit';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -80,12 +82,12 @@ const columns = [
   },
   { name: 'tags', label: 'Tags', field: 'tags', sortable: true },
   {
-    name: 'lowestPrice',
+    name: 'lowestPriceItem',
     label: 'Lowest Price',
-    field: 'lowestPrice',
+    field: 'lowestPriceItem',
     sortable: true,
-    format: (val: unknown, row: { unit: string }) => {
-      return val ? `${val}€/${row.unit}` : 'N/A';
+    format: (val: PriceItem) => {
+      return val ? `${val.price}€/${val.unit}` : 'N/A';
     },
   },
 ];
@@ -95,8 +97,8 @@ const storeColumns = props.stores.map((store) => ({
   label: store,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   field: (row: any) => row.storePrices?.[store] ?? null,
-  format: (val: unknown, row: { unit: string }) => {
-    return val ? `${val}€/${row.unit}` : '-';
+  format: (val: { value: number; unit: ProductQuantityUnit | null }) => {
+    return val ? `${val.value}€/${val.unit}` : '-';
   },
   sortable: true,
 }));
@@ -105,22 +107,41 @@ const allColumns = [...columns, ...storeColumns];
 
 const productsWithMeta = computed(() => {
   return props.filteredProducts.map((product) => {
-    const lowestPrice = product.prices
-      ? Math.min(...product.prices.map((priceItem) => priceItem.price))
+    const lowestPriceItem = product.prices
+      ? product.prices.reduce((min, current) =>
+          current.price < min.price ? current : min
+        )
       : null;
+
     const storePrices = props.stores.reduce(
-      (acc: { [key: string]: number | null }, store: string) => {
+      (
+        acc: {
+          [key: string]: {
+            value: number;
+            unit: ProductQuantityUnit | null;
+          } | null;
+        },
+        store: string
+      ) => {
         const priceItem = product.prices?.find(
           (price) => price.storeId === store
         );
-        acc[store] = priceItem ? priceItem.price : null;
+        if (!priceItem) {
+          acc[store] = null;
+          return acc;
+        }
+        acc[store] = {
+          value: priceItem.price,
+          unit: priceItem.unit,
+        };
         return acc;
       },
       {}
     );
+
     return {
       ...product,
-      lowestPrice,
+      lowestPriceItem,
       storePrices,
     };
   });
