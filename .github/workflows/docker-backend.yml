@@ -25,6 +25,17 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore _sources/backend/api/ChefMate.API.sln
+
+      - name: Run unit tests
+        run: dotnet test _sources/backend/api/ChefMate.API.sln --no-restore --verbosity normal
+
       - name: Build Docker image
         run: |
           cd _sources/backend/api/ChefMate.API
