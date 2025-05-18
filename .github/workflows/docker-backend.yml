@@ -25,6 +25,22 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore _sources/backend/api/ChefMate.API.sln
+
+      - name: Run unit tests
+        run: |
+          dotnet test _sources/backend/api/ChefMate.API.sln --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx"
+          cat test-results.trx | grep "<UnitTestResult" | wc -l | xargs echo "Total Tests Run:"
+          cat test-results.trx | grep "outcome=\"Passed\"" | wc -l | xargs echo "Tests Passed:"
+          cat test-results.trx | grep "outcome=\"Failed\"" | wc -l | xargs echo "Tests Failed:"
+          cat test-results.trx | grep "outcome=\"NotExecuted\"" | wc -l | xargs echo "Tests Skipped:"
+
       - name: Build Docker image
         run: |
           cd _sources/backend/api/ChefMate.API
