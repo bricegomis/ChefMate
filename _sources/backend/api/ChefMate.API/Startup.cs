@@ -140,7 +140,8 @@ public class Startup(IConfiguration configuration)
             {
                 if (args.Entity is IDateTracked dateTracked)
                 {
-                    if (string.IsNullOrEmpty(args.DocumentId))
+                    // If DateCreated is the default value, it's a new document
+                    if (dateTracked.DateCreated == DateTimeOffset.MinValue)
                     {
                         dateTracked.DateCreated = dateTimeService?.GetNow() ?? DateTimeOffset.UtcNow;
                     }
