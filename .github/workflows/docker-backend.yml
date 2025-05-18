@@ -34,17 +34,7 @@ jobs:
         run: dotnet restore _sources/backend/api/ChefMate.API.sln
 
       - name: Run unit tests
-        run: |
-          test_output=$(dotnet test _sources/backend/api/ChefMate.API.sln --no-restore --verbosity normal --no-build-warnings-as-errors)
-          echo "$test_output"
-          passed=$(echo "$test_output" | grep -oP "(?<=Passed: )\d+")
-          failed=$(echo "$test_output" | grep -oP "(?<=Failed: )\d+")
-          skipped=$(echo "$test_output" | grep -oP "(?<=Skipped: )\d+")
-          echo "::notice::Tests Passed: $passed"
-          if [ "$failed" -gt 0 ]; then
-            echo "::error::Tests Failed: $failed"
-          fi
-          echo "::notice::Tests Skipped: $skipped"
+        run: dotnet test _sources/backend/api/ChefMate.API.sln --no-restore --verbosity normal
 
       - name: Build Docker image
         run: |
