@@ -31,7 +31,7 @@
             @click.stop="deleteProduct(props.row)"
           /><br />
           <span class="text-italic text-caption text-left">{{
-            props.row.comments
+            props.row.description
           }}</span>
         </q-td>
         <q-td :props="props" key="actions"> </q-td>
@@ -113,7 +113,7 @@ const productsWithMeta = computed(() => {
     const storePrices = props.stores.reduce(
       (acc: { [key: string]: number | null }, store: string) => {
         const priceItem = product.prices?.find(
-          (price) => price.storeName === store
+          (price) => price.storeId === store
         );
         acc[store] = priceItem ? priceItem.price : null;
         return acc;

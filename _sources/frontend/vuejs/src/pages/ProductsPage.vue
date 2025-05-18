@@ -54,7 +54,8 @@ function onSearch(searchQuery: string) {
 
 // Filter products based on selected types
 const filteredProducts = computed(() => {
-  return selectedTypes.value.length
+  return products.value;
+  /*  return selectedTypes.value.length
     ? products.value.filter(
         (product) =>
           product.type &&
@@ -65,6 +66,7 @@ const filteredProducts = computed(() => {
               .includes(searchFilter.value.toLowerCase()))
       )
     : [];
+    */
 });
 
 const types = computed(() => {

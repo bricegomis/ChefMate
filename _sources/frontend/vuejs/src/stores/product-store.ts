@@ -11,9 +11,9 @@ export const useProductStore = defineStore('ProductStore', () => {
   const types = computed(() =>
     Object.entries(
       products.value.reduce((acc: Record<string, number>, product) => {
-        if (product.type) {
-          acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
-        }
+        // if (product.type) {
+        //   acc[product.type] = (acc[product.type] || 0) + 1; // Count occurrences
+        // }
         return acc;
       }, {})
     )
@@ -31,7 +31,7 @@ export const useProductStore = defineStore('ProductStore', () => {
     Array.from(
       new Set(
         products.value.flatMap(
-          (product) => product.prices?.map((price) => price.storeName) || []
+          (product) => product.prices?.map((price) => price.storeId) || []
         )
       )
     )
@@ -49,7 +49,7 @@ export const useProductStore = defineStore('ProductStore', () => {
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get('product/all');
+      const response = await api.get('product');
       products.value = response.data;
     } catch (error) {
       console.error('Error fetching Products:', error);

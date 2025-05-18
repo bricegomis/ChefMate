@@ -2,10 +2,7 @@
   <q-dialog v-model="isOpen">
     <q-card class="my-card">
       <div class="relative">
-        <q-img
-          src="https://images.squarespace-cdn.com/content/v1/56801b350e4c11744888ec37/1638140190362-T3SNAJ7RSFSU2VUO9NHA/Carottes+rapee+blue+banner.jpg?format=1500w"
-          :ratio="16 / 9"
-        >
+        <q-img :src="product.image ?? ''" :ratio="16 / 9" width="600px">
           <div class="absolute-bottom text-subtitle2 text-center">
             {{ lowestPrice }} € / {{ product.unit }}
           </div>
@@ -35,11 +32,11 @@
           <q-card-section class="q-pt-none">
             <div class="text-subtitle1"></div>
             <div class="text-caption text-grey">
-              {{ product.comments }}
+              {{ product.description }}
             </div>
           </q-card-section>
           <q-card-section>
-            <q-select
+            <!-- <q-select
               filled
               v-model="editingProduct.type"
               dense
@@ -49,13 +46,13 @@
               :options="types"
               label="Type"
               options-dense
-            />
+            /> -->
           </q-card-section>
         </q-tab-panel>
         <q-tab-panel name="prices">
           <q-table
             :rows="product.prices || []"
-            row-key="storeName"
+            row-key="storeId"
             :columns="priceColumns"
           />
         </q-tab-panel>
@@ -125,7 +122,7 @@ const priceColumns = [
   {
     name: 'store',
     label: 'Store',
-    field: 'storeName',
+    field: 'storeId',
     sortable: true,
     style: 'width: 80px',
   },
