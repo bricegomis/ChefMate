@@ -1,8 +1,10 @@
-import { ModelBase } from './ModelBase';
 import { PriceItem } from './PriceItem';
 import { ProductUsageType } from './ProductUsageType';
 
-export interface Product extends ModelBase {
+export interface Product {
+  id: string;
+  dateCreated: string;
+  dateModified: string;
   name: string;
   image: string | null;
   description: string | null;

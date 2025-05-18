@@ -1,6 +1,6 @@
-import { ModelBase } from './ModelBase';
-
-export interface Profile extends ModelBase {
+export interface Profile {
+  email: string;
+  displayName: string;
+  avatarUrl: string | null;
   dateLastConnection: string;
-  login: string;
 }

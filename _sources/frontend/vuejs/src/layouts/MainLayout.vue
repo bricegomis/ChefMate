@@ -43,10 +43,13 @@
           @click="authStore.setShowAuthPopup(true)"
         />
 
-        <div class="row text-h6 text-black justify-around items-center">
+        <div
+          class="row text-h6 text-black justify-around items-center"
+          v-if="productStore.profile"
+        >
           <div>
             <q-avatar size="24px">
-              <q-img src="/img/ChefMate.jpg" ratio="1" />
+              <q-img :src="productStore.profile?.avatarUrl ?? ''" ratio="1" />
             </q-avatar>
           </div>
         </div>

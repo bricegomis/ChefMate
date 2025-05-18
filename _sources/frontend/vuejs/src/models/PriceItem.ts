@@ -1,7 +1,6 @@
-import { ModelBase } from './ModelBase';
 import { ProductQuantityUnit } from './ProductQuantityUnit';
 
-export interface PriceItem extends ModelBase {
+export interface PriceItem {
   price: number;
   quantity: number;
   unit: ProductQuantityUnit;

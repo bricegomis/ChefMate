@@ -10,8 +10,7 @@ public class ProfileRepository(IAsyncDocumentSession session) : IProfileReposito
 {
     public async Task<ProfileDocument?> GetByIdAsync(string id)
     {
-        return await session.Query<ProfileDocument>()
-            .FirstOrDefaultAsync(x => x.Id == id);
+        return await session.LoadAsync<ProfileDocument>(id);
     }
 
     public async Task<ProfileDocument?> GetByEmailAsync(string id)

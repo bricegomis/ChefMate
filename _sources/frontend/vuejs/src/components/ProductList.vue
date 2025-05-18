@@ -89,8 +89,7 @@ const columns = [
     },
   },
 ];
-
-// Création des colonnes dynamiquement pour chaque magasin
+// Add a column for each store
 const storeColumns = props.stores.map((store) => ({
   name: store,
   label: store,
@@ -102,7 +101,6 @@ const storeColumns = props.stores.map((store) => ({
   sortable: true,
 }));
 
-// Ajout des colonnes des magasins aux colonnes existantes
 const allColumns = [...columns, ...storeColumns];
 
 const productsWithMeta = computed(() => {

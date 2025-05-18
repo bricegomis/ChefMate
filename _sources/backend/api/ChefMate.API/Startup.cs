@@ -132,6 +132,12 @@ public class Startup(IConfiguration configuration)
             {
                 if (type == typeof(ProductDocument))
                     return "Products";
+                if (type == typeof(ProfileDocument))
+                    return "Profiles";
+                if (type.ToString().EndsWith("Document"))
+                {
+                    return type.Name[..^"Document".Length];
+                }
                 return DocumentConventions.DefaultGetCollectionName(type);
             };
 
