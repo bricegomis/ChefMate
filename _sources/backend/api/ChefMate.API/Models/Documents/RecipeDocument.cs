@@ -8,7 +8,7 @@ public class RecipeDocument :
     IIdentifiable,
     IDateTracked
 {
-    public required string Id { get; set; }
+    public string? Id { get; set; }
     public required string ProfileId { get; set; }
     public DateTimeOffset DateCreated { get; set; }
     public DateTimeOffset DateModified { get; set; }

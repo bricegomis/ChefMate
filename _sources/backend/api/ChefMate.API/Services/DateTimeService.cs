@@ -2,11 +2,6 @@
 
 namespace ChefMate.API.Services;
 
-public interface IDateTimeService
-{
-    public DateTimeOffset GetNow();
-}
-
 [Injectable]
 public class DateTimeService : IDateTimeService
 {

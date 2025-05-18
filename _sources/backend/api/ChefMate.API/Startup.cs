@@ -14,7 +14,7 @@ namespace ChefMate.API;
 
 public class Startup(IConfiguration configuration)
 {
-    public IConfiguration Configuration { get; } = configuration;
+    public IConfiguration Configuration { get; } = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
     public void ConfigureServices(IServiceCollection services)
     {
@@ -64,13 +64,17 @@ public class Startup(IConfiguration configuration)
             c.OperationFilter<AuthorizeCheckOperationFilter>();
 
         });
-        
+
         RegisterRavenDb(services);
 
         services.AddAttributedServices();
 
-        var key = Encoding.UTF8.GetBytes(configuration["AuthSettings:JwtKey"]);
-
+        var jwtKey = Configuration["AuthSettings:JwtKey"];
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            throw new InvalidOperationException("JWT Key is not configured in AuthSettings:JwtKey.");
+        }
+        var key = Encoding.UTF8.GetBytes(jwtKey);
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -84,8 +88,8 @@ public class Startup(IConfiguration configuration)
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = configuration["AuthSettings:JwtIssuer"],
-                ValidAudience = configuration["AuthSettings:JwtAudience"],
+                ValidIssuer = Configuration["AuthSettings:JwtIssuer"],
+                ValidAudience = Configuration["AuthSettings:JwtAudience"],
                 IssuerSigningKey = new SymmetricSecurityKey(key)
             };
         });
@@ -97,8 +101,12 @@ public class Startup(IConfiguration configuration)
     {
         var ravenDbServer = Configuration["RavenDB_Server"];
         var ravenDbName = Configuration["RavenDB_DbName"];
-        var ravenDbCertBase64 = configuration["RavenDB_CertificateBase64"];
-        var ravenDbCertPassword = configuration["RavenDB_CertificatePassword"];
+        var ravenDbCertBase64 = Configuration["RavenDB_CertificateBase64"];
+        var ravenDbCertPassword = Configuration["RavenDB_CertificatePassword"];
+        if (ravenDbCertBase64 == null || ravenDbCertPassword == null || ravenDbServer == null || ravenDbName == null)
+        {
+            throw new InvalidOperationException("RavenDB configuration is missing");
+        }
         var certBytes = Convert.FromBase64String(ravenDbCertBase64);
         var ravenDbCertificate = new X509Certificate2(certBytes, ravenDbCertPassword);
         services.AddSingleton<IDocumentStore>(sp =>
@@ -177,7 +185,7 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
 
         operation.Security.Add(new OpenApiSecurityRequirement
         {
-            [scheme] = new List<string>()
+            [scheme] = []
         });
     }
 }

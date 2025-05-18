@@ -29,7 +29,13 @@ public class AuthController(IConfiguration config) : ControllerBase
 
     private string GenerateJwtToken(string email)
     {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["AuthSettings:JwtKey"]));
+        var jwtKey = _config["AuthSettings:JwtKey"];
+        if (string.IsNullOrEmpty(jwtKey))
+        {
+            throw new InvalidOperationException("JWT key is not configured.");
+        }
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
