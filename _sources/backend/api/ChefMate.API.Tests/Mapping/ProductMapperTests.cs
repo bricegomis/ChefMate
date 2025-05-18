@@ -1,11 +1,8 @@
-using System;
-using System.Collections.Generic;
 using ChefMate.API.Mapping;
 using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Dto;
 using ChefMate.API.Models.Enums;
 using FluentAssertions;
-using Xunit;
 
 namespace ChefMate.API.Tests.Mapping;
 
@@ -25,10 +22,10 @@ public class ProductMapperTests
             Name = "Test",
             Description = "Desc",
             Image = "img.png",
-            Labels = new List<string> { "A", "B" },
-            Tags = new List<string> { "tag1" },
-            Prices = new List<PriceHistory>
-            {
+            Labels = ["A", "B"],
+            Tags = ["tag1"],
+            Prices =
+            [
                 new PriceHistory
                 {
                     StoreId = "store1",
@@ -37,8 +34,8 @@ public class ProductMapperTests
                     Unit = ProductQuantityUnit.Kg,
                     DateBuying = DateTimeOffset.UtcNow.AddDays(-2)
                 }
-            },
-            Usages = new List<ProductUsageType> { ProductUsageType.Food }
+            ],
+            Usages = [ProductUsageType.Food]
         };
 
         var dto = _mapper.ToDto(doc);
@@ -116,9 +113,9 @@ public class ProductMapperTests
             Name = "New",
             Description = "Desc",
             Image = "img.png",
-            Labels = new List<string> { "A" },
-            Tags = new List<string> { "tag" },
-            Usages = new List<ProductUsageType> { ProductUsageType.Food }
+            Labels = ["A"],
+            Tags = ["tag"],
+            Usages = [ProductUsageType.Food]
         };
         var profileId = "profileX";
 
@@ -146,9 +143,9 @@ public class ProductMapperTests
             Name = "Old",
             Description = "OldDesc",
             Image = "old.png",
-            Labels = new List<string> { "X" },
-            Tags = new List<string> { "old" },
-            Usages = new List<ProductUsageType> { ProductUsageType.Other }
+            Labels = ["X"],
+            Tags = ["old"],
+            Usages = [ProductUsageType.Other]
         };
 
         var dto = new ProductUpdateDto
@@ -157,9 +154,9 @@ public class ProductMapperTests
             Name = "Updated",
             Description = "NewDesc",
             Image = "new.png",
-            Labels = new List<string> { "Y" },
-            Tags = new List<string> { "new" },
-            Usages = new List<ProductUsageType> { ProductUsageType.Food }
+            Labels = ["Y"],
+            Tags = ["new"],
+            Usages = [ProductUsageType.Food]
         };
 
         _mapper.UpdateDocument(dto, doc, profileId);

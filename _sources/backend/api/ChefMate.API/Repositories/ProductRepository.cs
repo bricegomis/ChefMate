@@ -14,7 +14,6 @@ public interface IProductRepository
     Task<List<ProductDocument>> GetAllAsync(string profileId);
     Task UpdateAsync(ProductDocument product);
     Task DeleteAsync(string id);
-    Task BulkInsertAsync(IEnumerable<ProductDocument> products);
 }
 
 [Injectable]
@@ -77,15 +76,6 @@ public class ProductRepository : IProductRepository
         {
             _session.Delete(product);
             await _session.SaveChangesAsync();
-        }
-    }
-
-    public async Task BulkInsertAsync(IEnumerable<ProductDocument> products)
-    {       
-        using var bulkInsert = _store.BulkInsert();
-        foreach (var product in products)
-        {
-            await bulkInsert.StoreAsync(product);
         }
     }
 }
