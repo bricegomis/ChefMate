@@ -1,7 +1,7 @@
 <template>
   <q-page title="Receipes">
-    <q-table dense title="Recettes" :rows-per-page-options="[20, 50, 100]">
-    </q-table>
+    <!-- <q-table dense title="Recettes" :rows-per-page-options="[20, 50, 100]">
+    </q-table> -->
   </q-page>
 </template>
 
