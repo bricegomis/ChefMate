@@ -1,4 +1,5 @@
 ﻿using ChefMate.API.Attributes;
+using ChefMate.API.Services.Interfaces;
 
 namespace ChefMate.API.Services;
 

@@ -1,11 +1,10 @@
 ﻿using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Dto;
 
-namespace ChefMate.API.Services;
+namespace ChefMate.API.Services.Interfaces;
 
 public interface IProductService
 {
-    Task BulkImportAsync(IEnumerable<ProductDocument> products);
     Task<List<ProductDocument>> GetAllAsync(string profileId);
     Task<ProductDocument> GetByIdAsync(string id);
     Task DeleteAsync(string id);

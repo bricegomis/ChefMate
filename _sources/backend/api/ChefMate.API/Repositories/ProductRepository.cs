@@ -1,7 +1,7 @@
 ﻿using ChefMate.API.Attributes;
 using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Documents.Interfaces;
-using ChefMate.API.Services;
+using ChefMate.API.Services.Interfaces;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 

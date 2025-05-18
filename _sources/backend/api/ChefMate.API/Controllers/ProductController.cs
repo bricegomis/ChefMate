@@ -1,31 +1,28 @@
 using ChefMate.API.Mapping;
 using ChefMate.API.Models.Dto;
-using ChefMate.API.Services;
+using ChefMate.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace ChefMate.API.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ProductController(ILogger<ProductController> logger,
-                        IProductService productService) : ControllerBase
+public class ProductController(
+    ILogger<ProductController> logger,
+    IProductService productService,
+    IProfileContextService profileContext) : ControllerBase
 {
     private readonly ILogger<ProductController> _logger = logger;
     private readonly IProductService _service = productService;
+    private readonly IProfileContextService _profileContext = profileContext;
     private static readonly ProductMapper _mapper = new();
 
     [HttpGet]
     public async Task<ActionResult<List<ProductDto>>> GetAll()
     {
-        var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        if (string.IsNullOrEmpty(userEmail))
-            return Unauthorized();
-
-        var profileId = $"profiles/{userEmail}";
-
+        var profileId = _profileContext.GetCurrentProfileId(User);
         var products = await _service.GetAllAsync(profileId);
         var dtos = _mapper.ToDtoList(products);
         return Ok(dtos);
@@ -34,11 +31,7 @@ public class ProductController(ILogger<ProductController> logger,
     [HttpPost]
     public async Task<ActionResult<ProductDto>> Create([FromBody] ProductCreateDto dto)
     {
-        var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        if (string.IsNullOrEmpty(userEmail))
-            return Unauthorized();
-
-        var profileId = $"profiles/{userEmail}";
+        var profileId = _profileContext.GetCurrentProfileId(User);
         var product = await _service.AddAsync(dto, profileId);
         return CreatedAtAction(nameof(GetAll), new { id = product.Id }, _mapper.ToDto(product));
     }
@@ -49,11 +42,7 @@ public class ProductController(ILogger<ProductController> logger,
         if (id != dto.Id)
             return BadRequest("Id mismatch");
 
-        var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        if (string.IsNullOrEmpty(userEmail))
-            return Unauthorized();
-
-        var profileId = $"profiles/{userEmail}";
+        var profileId = _profileContext.GetCurrentProfileId(User);
         var updated = await _service.UpdateAsync(dto, profileId);
         if (updated == null)
             return NotFound();
@@ -64,11 +53,7 @@ public class ProductController(ILogger<ProductController> logger,
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var userEmail = User.FindFirstValue(ClaimTypes.Email);
-        if (string.IsNullOrEmpty(userEmail))
-            return Unauthorized();
-
-        var profileId = $"profiles/{userEmail}";
+        var profileId = _profileContext.GetCurrentProfileId(User);
         var deleted = await _service.DeleteAsync(id, profileId);
         if (!deleted)
             return NotFound();

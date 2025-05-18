@@ -1,4 +1,4 @@
-﻿namespace ChefMate.API.Services;
+﻿namespace ChefMate.API.Services.Interfaces;
 
 public interface IDateTimeService
 {
