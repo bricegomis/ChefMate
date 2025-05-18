@@ -1,6 +1,6 @@
 using ChefMate.API.Models.Enums;
 
-namespace ChefMate.API.Models.Dto;
+namespace ChefMate.API.Models.Dto.Product;
 
 public class ProductDto
 {

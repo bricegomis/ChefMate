@@ -1,5 +1,5 @@
 using ChefMate.API.Models.Documents;
-using ChefMate.API.Models.Dto;
+using ChefMate.API.Models.Dto.Product;
 
 namespace ChefMate.API.Mapping.Interfaces;
 

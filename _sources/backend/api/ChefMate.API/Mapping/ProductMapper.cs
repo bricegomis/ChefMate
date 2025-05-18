@@ -1,7 +1,7 @@
 using ChefMate.API.Attributes;
 using ChefMate.API.Mapping.Interfaces;
 using ChefMate.API.Models.Documents;
-using ChefMate.API.Models.Dto;
+using ChefMate.API.Models.Dto.Product;
 using Riok.Mapperly.Abstractions;
 
 namespace ChefMate.API.Mapping;
@@ -21,10 +21,8 @@ public partial class ProductMapper : IProductMapper
     [MapperIgnoreTarget(nameof(ProductDocument.Id))]
     [MapperIgnoreTarget(nameof(ProductDocument.DateCreated))]
     [MapperIgnoreTarget(nameof(ProductDocument.DateModified))]
-    [MapperIgnoreTarget(nameof(ProductDocument.Prices))]
     public partial ProductDocument ToDocument(ProductCreateDto dto, string profileId);
     [MapperIgnoreTarget(nameof(ProductDocument.DateCreated))]
     [MapperIgnoreTarget(nameof(ProductDocument.DateModified))]
-    [MapperIgnoreTarget(nameof(ProductDocument.Prices))]
     public partial void UpdateDocument(ProductUpdateDto dto, ProductDocument document, string profileId);
 }

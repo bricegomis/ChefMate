@@ -1,6 +1,6 @@
 using ChefMate.API.Models.Enums;
 
-namespace ChefMate.API.Models.Dto;
+namespace ChefMate.API.Models.Dto.Product;
 
 public class ProductCreateDto
 {
@@ -10,4 +10,5 @@ public class ProductCreateDto
     public List<string>? Labels { get; set; }
     public List<string>? Tags { get; set; }
     public List<ProductUsageType>? Usages { get; set; }
+    public List<PriceHistoryDto>? Prices { get; set; }
 }

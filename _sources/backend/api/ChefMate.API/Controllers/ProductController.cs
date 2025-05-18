@@ -1,5 +1,5 @@
 using ChefMate.API.Mapping.Interfaces;
-using ChefMate.API.Models.Dto;
+using ChefMate.API.Models.Dto.Product;
 using ChefMate.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
