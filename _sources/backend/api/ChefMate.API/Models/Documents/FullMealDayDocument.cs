@@ -1,9 +1,20 @@
-﻿namespace ChefMate.API.Models.Documents;
+﻿using ChefMate.API.Models.Documents.Interfaces;
 
-public class FullMealDayDocument : DocumentBase
+namespace ChefMate.API.Models.Documents;
+
+public class FullMealDayDocument :
+    IProfileChild,
+    IIdentifiable,
+    IDateTracked
 {
+    public required string Id { get; set; }
+    public required string ProfileId { get; set; }
+    public DateTimeOffset DateCreated { get; set; }
+    public DateTimeOffset DateModified { get; set; }
+
     public string? BreakfastRecipeId { get; set; }
     public string? LunchRecipeId { get; set; }
     public string? DinnerRecipeId { get; set; }
     public DateOnly Date { get; set; }
+
 }

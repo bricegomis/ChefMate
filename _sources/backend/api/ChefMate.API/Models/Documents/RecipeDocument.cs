@@ -1,7 +1,17 @@
-﻿namespace ChefMate.API.Models.Documents;
+﻿using ChefMate.API.Models.Documents.Interfaces;
 
-public class RecipeDocument : DocumentBase
+namespace ChefMate.API.Models.Documents;
+
+public class RecipeDocument :
+    IProfileChild,
+    IIdentifiable,
+    IDateTracked
 {
+    public required string Id { get; set; }
+    public required string ProfileId { get; set; }
+    public DateTimeOffset DateCreated { get; set; }
+    public DateTimeOffset DateModified { get; set; }
+
     public string? Name { get; set; }
     public List<Ingredient> Ingredients { get; set; } = [];
     public string? Instructions { get; set; }

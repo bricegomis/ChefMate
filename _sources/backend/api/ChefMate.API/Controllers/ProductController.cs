@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using ChefMate.API.Models.Dto;
+using ChefMate.API.Mapping;
 
 namespace ChefMate.API.Controllers;
 
@@ -15,6 +16,7 @@ public class ProductController(ILogger<ProductController> logger,
 {
     private readonly ILogger<ProductController> _logger = logger;
     private readonly IProductService _service = productService;
+    private static readonly ProductMapper _mapper = new();
 
     [HttpPost("import")]
     public async Task<IActionResult> Import([FromBody] List<ProductDocument> products)
@@ -31,21 +33,8 @@ public class ProductController(ILogger<ProductController> logger,
             return Unauthorized();
 
         var products = await _service.GetAllAsync(userEmail);
-        // Mapping ProductDocument -> ProductDto
-        var dtos = products.Select(p => new ProductDto
-        {
-            Id = p.Id,
-            ProfileId = p.ProfileId,
-            Name = p.Name,
-            Labels = p.Labels,
-            Type = p.Type,
-            Comments = p.Comments,
-            Tags = p.Tags,
-            Image = p.Image,
-            DateCreated = p.DateCreated,
-            DateModified = p.DateModified
-        }).ToList();
-
+        // Utilisation de Mapperly pour le mapping
+        var dtos = _mapper.ToDtoList(products);
         return Ok(dtos);
     }
 }
