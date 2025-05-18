@@ -1,11 +1,14 @@
 using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Dto;
 using Riok.Mapperly.Abstractions;
+using ChefMate.API.Attributes;
+using ChefMate.API.Mapping.Interfaces;
 
 namespace ChefMate.API.Mapping;
 
+[Injectable(ServiceLifetime.Singleton)]
 [Mapper]
-public partial class ProductMapper
+public partial class ProductMapper : IProductMapper
 {
     [MapperIgnoreSource(nameof(ProductDocument.ProfileId))]
     public partial ProductDto ToDto(ProductDocument doc);

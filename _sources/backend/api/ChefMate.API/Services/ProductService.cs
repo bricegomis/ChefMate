@@ -1,5 +1,5 @@
 ﻿using ChefMate.API.Attributes;
-using ChefMate.API.Mapping;
+using ChefMate.API.Mapping.Interfaces;
 using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Dto;
 using ChefMate.API.Repositories;
@@ -8,10 +8,10 @@ using ChefMate.API.Services.Interfaces;
 namespace ChefMate.API.Services;
 
 [Injectable]
-public class ProductService(IProductRepository repository) : IProductService
+public class ProductService(IProductRepository repository, IProductMapper mapper) : IProductService
 {
     private readonly IProductRepository _repository = repository;
-    private static readonly ProductMapper _mapper = new();
+    private readonly IProductMapper _mapper = mapper;
 
     public Task<List<ProductDocument>> GetAllAsync(string profileId)
     {
