@@ -3,7 +3,7 @@ using ChefMate.API.Services.Interfaces;
 
 namespace ChefMate.API.Services;
 
-[Injectable]
+[Injectable(ServiceLifetime.Singleton)]
 public class DateTimeService : IDateTimeService
 {
     public DateTimeOffset GetNow()

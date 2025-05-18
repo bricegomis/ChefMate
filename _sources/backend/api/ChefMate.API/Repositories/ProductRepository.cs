@@ -17,65 +17,40 @@ public interface IProductRepository
 }
 
 [Injectable]
-public class ProductRepository : IProductRepository
+public class ProductRepository(
+    IAsyncDocumentSession session) : IProductRepository
 {
-    private readonly IAsyncDocumentSession _session;
-    private readonly IDocumentStore _store;
-    private readonly IDateTimeService _dateTimeService;
-
-    public ProductRepository(
-        IAsyncDocumentSession session,
-        IDocumentStore store,
-        IDateTimeService dateTimeService)
-    {
-        _session = session;
-        _store = store;
-        _dateTimeService = dateTimeService;
-
-        _store.OnBeforeStore += (sender, args) =>
-        {
-            if (args.Entity is IDateTracked dateTracked)
-            {
-                if (string.IsNullOrEmpty(args.DocumentId))
-                {
-                    dateTracked.DateCreated = _dateTimeService.GetNow();
-                }
-                dateTracked.DateModified = _dateTimeService.GetNow();
-            }
-        };
-    }
-
     public async Task AddAsync(ProductDocument product)
     {
-        await _session.StoreAsync(product);
-        await _session.SaveChangesAsync();
+        await session.StoreAsync(product);
+        await session.SaveChangesAsync();
     }
 
     public async Task<ProductDocument> GetByIdAsync(string id)
     {
-        return await _session.LoadAsync<ProductDocument>(id);
+        return await session.LoadAsync<ProductDocument>(id);
     }
 
     public async Task<List<ProductDocument>> GetAllAsync(string profileId)
     {
-        return await _session.Query<ProductDocument>()
+        return await session.Query<ProductDocument>()
             .Where(x => x.ProfileId == profileId)
             .ToListAsync();
     }
 
     public async Task UpdateAsync(ProductDocument product)
     {
-        await _session.StoreAsync(product);
-        await _session.SaveChangesAsync();
+        await session.StoreAsync(product);
+        await session.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(string id)
     {
-        var product = await _session.LoadAsync<ProductDocument>(id);
+        var product = await session.LoadAsync<ProductDocument>(id);
         if (product != null)
         {
-            _session.Delete(product);
-            await _session.SaveChangesAsync();
+            session.Delete(product);
+            await session.SaveChangesAsync();
         }
     }
 }

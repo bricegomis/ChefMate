@@ -1,5 +1,8 @@
 using ChefMate.API.Extensions;
+using ChefMate.API.Filters;
 using ChefMate.API.Models.Documents;
+using ChefMate.API.Models.Documents.Interfaces;
+using ChefMate.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -28,12 +31,15 @@ public class Startup(IConfiguration configuration)
             });
         });
 
-        services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-            });
+        services.AddControllers(options =>
+        {
+            options.Filters.Add<UnescapeIdActionFilter>();
+        })
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        });
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c =>
         {
@@ -65,9 +71,9 @@ public class Startup(IConfiguration configuration)
 
         });
 
-        RegisterRavenDb(services);
-
         services.AddAttributedServices();
+
+        RegisterRavenDb(services);
 
         var jwtKey = Configuration["AuthSettings:JwtKey"];
         if (string.IsNullOrEmpty(jwtKey))
@@ -127,6 +133,19 @@ public class Startup(IConfiguration configuration)
                 if (type == typeof(ProductDocument))
                     return "Products";
                 return DocumentConventions.DefaultGetCollectionName(type);
+            };
+
+            var dateTimeService = sp.GetService<IDateTimeService>();
+            store.OnBeforeStore += (sender, args) =>
+            {
+                if (args.Entity is IDateTracked dateTracked)
+                {
+                    if (string.IsNullOrEmpty(args.DocumentId))
+                    {
+                        dateTracked.DateCreated = dateTimeService?.GetNow() ?? DateTimeOffset.UtcNow;
+                    }
+                    dateTracked.DateModified = dateTimeService?.GetNow() ?? DateTimeOffset.UtcNow;
+                }
             };
 
             store.Initialize();
