@@ -33,7 +33,6 @@ public class ProductController(ILogger<ProductController> logger,
             return Unauthorized();
 
         var products = await _service.GetAllAsync(userEmail);
-        // Utilisation de Mapperly pour le mapping
         var dtos = _mapper.ToDtoList(products);
         return Ok(dtos);
     }

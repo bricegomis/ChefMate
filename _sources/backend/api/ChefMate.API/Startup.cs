@@ -169,7 +169,7 @@ public class AuthorizeCheckOperationFilter : IOperationFilter
 
         if (!hasAuthorize) return;
 
-        operation.Security ??= new List<OpenApiSecurityRequirement>();
+        operation.Security ??= [];
 
         var scheme = new OpenApiSecurityScheme
         {

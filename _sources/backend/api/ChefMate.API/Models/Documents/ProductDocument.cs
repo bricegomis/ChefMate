@@ -1,4 +1,5 @@
 ﻿using ChefMate.API.Models.Documents.Interfaces;
+using ChefMate.API.Models.Enums;
 
 namespace ChefMate.API.Models.Documents;
 
@@ -31,21 +32,4 @@ public class PriceHistory
     public double Quantity { get; set; }
     public ProductQuantityUnit Unit { get; set; }
     public DateTimeOffset DateBuying { get; set; }
-}
-
-public enum ProductQuantityUnit
-{
-    Kg,
-    L,
-    Piece
-}
-
-public enum ProductUsageType
-{
-    Food,
-    Cleaning,
-    PersonalCare,
-    Beverage,
-    Supplement,
-    Other
 }
