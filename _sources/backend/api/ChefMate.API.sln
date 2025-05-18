@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChefMate.API", "ChefMate.API\ChefMate.API.csproj", "{71BCFC7F-8BDA-4083-9ADA-1E50E4ED0ACD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChefMate.API.Tests", "ChefMate.API.Tests\ChefMate.API.Tests.csproj", "{1392B114-F5B1-9602-0AB9-7E1559AF3873}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{71BCFC7F-8BDA-4083-9ADA-1E50E4ED0ACD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71BCFC7F-8BDA-4083-9ADA-1E50E4ED0ACD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71BCFC7F-8BDA-4083-9ADA-1E50E4ED0ACD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1392B114-F5B1-9602-0AB9-7E1559AF3873}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1392B114-F5B1-9602-0AB9-7E1559AF3873}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1392B114-F5B1-9602-0AB9-7E1559AF3873}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1392B114-F5B1-9602-0AB9-7E1559AF3873}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
