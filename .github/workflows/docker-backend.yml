@@ -35,11 +35,16 @@ jobs:
 
       - name: Run unit tests
         run: |
-          dotnet test _sources/backend/api/ChefMate.API.sln --no-restore --verbosity normal --logger "trx;LogFileName=test-results.trx"
-          cat test-results.trx | grep "<UnitTestResult" | wc -l | xargs echo "Total Tests Run:"
-          cat test-results.trx | grep "outcome=\"Passed\"" | wc -l | xargs echo "Tests Passed:"
-          cat test-results.trx | grep "outcome=\"Failed\"" | wc -l | xargs echo "Tests Failed:"
-          cat test-results.trx | grep "outcome=\"NotExecuted\"" | wc -l | xargs echo "Tests Skipped:"
+          test_output=$(dotnet test _sources/backend/api/ChefMate.API.sln --no-restore --verbosity normal --no-build-warnings-as-errors)
+          echo "$test_output"
+          passed=$(echo "$test_output" | grep -oP "(?<=Passed: )\d+")
+          failed=$(echo "$test_output" | grep -oP "(?<=Failed: )\d+")
+          skipped=$(echo "$test_output" | grep -oP "(?<=Skipped: )\d+")
+          echo "::notice::Tests Passed: $passed"
+          if [ "$failed" -gt 0 ]; then
+            echo "::error::Tests Failed: $failed"
+          fi
+          echo "::notice::Tests Skipped: $skipped"
 
       - name: Build Docker image
         run: |
