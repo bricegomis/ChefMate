@@ -36,7 +36,7 @@ public class ProductService(IProductRepository repository, IProductMapper mapper
         if (product.ProfileId != profileId)
             throw new ApplicationException("Profile mismatch.");
 
-        _mapper.UpdateDocument(dto, product, profileId);       
+        _mapper.UpdateDocument(dto, product, profileId);
         await _repository.UpdateAsync(product);
         return product;
     }

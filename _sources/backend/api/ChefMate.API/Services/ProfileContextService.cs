@@ -1,6 +1,6 @@
-using System.Security.Claims;
 using ChefMate.API.Attributes;
 using ChefMate.API.Services.Interfaces;
+using System.Security.Claims;
 
 namespace ChefMate.API.Services;
 
