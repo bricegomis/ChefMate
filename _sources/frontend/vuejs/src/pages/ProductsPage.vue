@@ -5,7 +5,9 @@
         :tags="tags"
         :usages="Object.values(ProductUsageType)"
         :search="searchFilter"
+        :showStoreColumns="showStoreColumns"
         @search="onSearch"
+        @showStoreColumns="onShowStoreColumns"
       />
     </q-card>
     <ProductList
@@ -16,6 +18,7 @@
       @delete-product="handleDeleteProduct"
       @open-product="handleOpenProduct"
       :stores="stores"
+      :show-store-columns="showStoreColumns"
     />
     <ProductDetail
       :isOpen="popupDetailOpen"
@@ -35,7 +38,7 @@ import { ProductUsageType } from 'src/models/ProductUsageType';
 
 import { useQuasar } from 'quasar';
 import { useProductStore } from 'src/stores/product-store';
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import { Product } from 'src/models/Product';
 
 const productStore = useProductStore();
@@ -46,12 +49,22 @@ const products = computed(() => {
 });
 
 const searchFilter = ref<string>('');
+const showStoreColumns = ref(false);
 
 const popupDetailOpen = ref(false);
 const editingProduct = ref<Product>();
 
+// Fetch products when the page is loaded
+onMounted(() => {
+  productStore.fetchProducts();
+});
+
 function onSearch(searchQuery: string) {
   searchFilter.value = searchQuery;
+}
+
+function onShowStoreColumns(show: boolean) {
+  showStoreColumns.value = show;
 }
 
 // Filter products based on selected tags

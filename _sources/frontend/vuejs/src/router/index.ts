@@ -1,3 +1,4 @@
+import { useProfileStore } from 'src/stores/profile-store';
 import { route } from 'quasar/wrappers';
 import {
   createMemoryHistory,
@@ -20,7 +21,9 @@ import routes from './routes';
 export default route(function (/* { store, ssrContext } */) {
   const createHistory = process.env.SERVER
     ? createMemoryHistory
-    : (process.env.VUE_ROUTER_MODE === 'history' ? createWebHistory : createWebHashHistory);
+    : process.env.VUE_ROUTER_MODE === 'history'
+    ? createWebHistory
+    : createWebHashHistory;
 
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -30,6 +33,15 @@ export default route(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+
+  Router.beforeEach((to, from, next) => {
+    const profilStore = useProfileStore();
+    if (to.meta.requiresAuth && !profilStore.isAuthenticated) {
+      next('/profile');
+    } else {
+      next();
+    }
   });
 
   return Router;

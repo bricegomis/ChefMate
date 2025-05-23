@@ -37,16 +37,6 @@ export const useProductStore = defineStore('ProductStore', () => {
     )
   );
 
-  const fetchProfile = async () => {
-    try {
-      const response = await api.get('profile');
-      isOnline.value = true;
-      profile.value = response.data;
-    } catch (error) {
-      isOnline.value = false;
-    }
-  };
-
   const fetchProducts = async () => {
     try {
       const response = await api.get('product');
@@ -93,7 +83,6 @@ export const useProductStore = defineStore('ProductStore', () => {
     stores,
     profile,
     isOnline,
-    fetchProfile,
     fetchProducts,
     createProduct,
     updateProduct,

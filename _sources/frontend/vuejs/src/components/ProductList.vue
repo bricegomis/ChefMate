@@ -38,7 +38,14 @@
         <q-td :props="props" key="tags">
           {{ props.row.tags.join(', ') }}
         </q-td>
-        <q-td v-for="col in props.cols.slice(2)" :key="col.name" :props="props">
+        <q-td :props="props" key="lowestPriceItem">
+          {{
+            props.row.lowestPriceItem
+              ? `${props.row.lowestPriceItem.price}€/${props.row.lowestPriceItem.unit}`
+              : 'N/A'
+          }}
+        </q-td>
+        <q-td v-for="col in props.cols.slice(3)" :key="col.name" :props="props">
           <span>{{ col.value }}</span>
         </q-td>
       </q-tr>
@@ -47,7 +54,6 @@
 </template>
 
 <script setup lang="ts">
-import { PriceItem } from 'src/models/PriceItem';
 import { Product } from 'src/models/Product';
 import { ProductQuantityUnit } from 'src/models/ProductQuantityUnit';
 import { computed } from 'vue';
@@ -57,6 +63,7 @@ const props = defineProps<{
   allTypes: string[];
   selectedTags: string[];
   stores: string[];
+  showStoreColumns?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -86,24 +93,22 @@ const columns = [
     label: 'Lowest Price',
     field: 'lowestPriceItem',
     sortable: true,
-    format: (val: PriceItem) => {
-      return val ? `${val.price}€/${val.unit}` : 'N/A';
-    },
   },
 ];
 // Add a column for each store
 const storeColumns = props.stores.map((store) => ({
   name: store,
   label: store,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  field: (row: any) => row.storePrices?.[store] ?? null,
+  field: store, // Use a unique string identifier for the field
   format: (val: { value: number; unit: ProductQuantityUnit | null }) => {
     return val ? `${val.value}€/${val.unit}` : '-';
   },
   sortable: true,
 }));
 
-const allColumns = [...columns, ...storeColumns];
+const allColumns = computed(() => {
+  return props.showStoreColumns ? columns.concat(storeColumns) : columns;
+});
 
 const productsWithMeta = computed(() => {
   return props.filteredProducts.map((product) => {
