@@ -27,20 +27,35 @@
         <q-tab-panel name="infos">
           <q-card-section>
             <div class="row no-wrap items-center">
-              <div class="col text-h6 ellipsis">
+              <div class="col">
+                <q-rating v-model="stars" :max="5" size="16px" />
                 <q-input
                   color="purple-12"
                   v-model="editingProduct.name"
                   label="Name"
-                >
-                </q-input>
+                />
+                <q-select
+                  v-model="editingProduct.usages"
+                  :options="usages"
+                  :multiple="true"
+                  use-chips
+                  label="Usage"
+                />
+                <q-select
+                  v-model="editingProduct.tags"
+                  :options="tags"
+                  :multiple="true"
+                  input-debounce="0"
+                  use-input
+                  use-chips
+                  new-value-mode="add-unique"
+                  label="Tags"
+                />
               </div>
               <div
                 class="col-auto text-grey text-caption q-pt-md row no-wrap items-center"
               ></div>
             </div>
-
-            <q-rating v-model="stars" :max="5" size="16px" />
           </q-card-section>
 
           <q-card-section class="q-pt-none">
@@ -101,7 +116,8 @@ import { computed, ref } from 'vue';
 const props = defineProps<{
   isOpen: boolean;
   product: Product;
-  types: string[];
+  tags: string[];
+  usages: string[];
 }>();
 
 const editingProduct = computed(() => props.product);

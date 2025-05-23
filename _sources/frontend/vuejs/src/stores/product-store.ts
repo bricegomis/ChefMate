@@ -21,7 +21,7 @@ export const useProductStore = defineStore('ProductStore', () => {
       .map(([name, nbOccurrence]) =>
         reactive({
           name,
-          isSelected: true,
+          isSelected: false,
           nbOccurrence,
         })
       )
@@ -58,7 +58,8 @@ export const useProductStore = defineStore('ProductStore', () => {
   const updateProduct = async (product: Product): Promise<boolean> => {
     try {
       if (product.id) {
-        await api.put(`product/${product.id}`, product);
+        const encodedId = encodeURIComponent(product.id); // Encode the ID to handle special characters like '/'
+        await api.put(`product/${encodedId}`, product);
       } else {
         await api.post('product', product);
       }

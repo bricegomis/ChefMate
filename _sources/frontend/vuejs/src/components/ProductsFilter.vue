@@ -24,6 +24,18 @@
           >&nbsp; ({{ tag.nbOccurrence }})</span
         >
       </q-btn>
+      <!-- Add "No Tags" button -->
+      <q-btn
+        :outline="!noTagsFilter"
+        square
+        size="sm"
+        class="q-ma-xs"
+        color="red"
+        @click="toggleNoTagsFilter"
+        :text-color="noTagsFilter ? 'white' : 'black'"
+      >
+        <span>No Tags</span>
+      </q-btn>
     </div>
     <div>
       <q-checkbox v-model="showStoreColumnsFilter" label="Show store columns" />
@@ -32,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = defineProps<{
   search: string;
@@ -62,7 +74,10 @@ const showStoreColumnsFilter = computed({
 const emit = defineEmits<{
   (event: 'search', search: string): void;
   (event: 'showStoreColumns', value: boolean): void;
+  (event: 'filterNoTags', value: boolean): void;
 }>();
+
+const noTagsFilter = ref(false);
 
 function toggleType(
   selectedTag: { name: string; isSelected: boolean },
@@ -76,5 +91,14 @@ function toggleType(
       tag.isSelected = tag == selectedTag;
     });
   }
+  noTagsFilter.value = false; // Reset "No Tags" filter when selecting a tag
+}
+
+function toggleNoTagsFilter() {
+  noTagsFilter.value = !noTagsFilter.value;
+  props.tags.forEach((tag) => {
+    tag.isSelected = false; // Deselect all tags when "No Tags" is active
+  });
+  emit('filterNoTags', noTagsFilter.value);
 }
 </script>

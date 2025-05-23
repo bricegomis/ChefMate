@@ -8,6 +8,7 @@
         :showStoreColumns="showStoreColumns"
         @search="onSearch"
         @showStoreColumns="onShowStoreColumns"
+        @filterNoTags="onFilterNoTags"
       />
     </q-card>
     <ProductList
@@ -23,7 +24,8 @@
     <ProductDetail
       :isOpen="popupDetailOpen"
       :product="editingProduct || {} as Product"
-      :types="tags.map((_) => _.name)"
+      :tags="tags.map((_) => _.name)"
+      :usages="Object.values(ProductUsageType)"
       @close="popupDetailOpen = false"
       @save="saveProduct"
     />
@@ -50,6 +52,7 @@ const products = computed(() => {
 
 const searchFilter = ref<string>('');
 const showStoreColumns = ref(false);
+const noTagsFilter = ref(false);
 
 const popupDetailOpen = ref(false);
 const editingProduct = ref<Product>();
@@ -67,22 +70,26 @@ function onShowStoreColumns(show: boolean) {
   showStoreColumns.value = show;
 }
 
-// Filter products based on selected tags
+function onFilterNoTags(value: boolean) {
+  noTagsFilter.value = value;
+}
+
 const filteredProducts = computed(() => {
-  return selectedTags.value.length
-    ? products.value.filter(
-        (product) =>
-          (product.tags == null ||
-            product.tags?.length < 1 ||
-            product.tags?.some((tag) =>
-              selectedTags.value.map((_) => _.name).includes(tag)
-            )) &&
-          (searchFilter.value.length === 0 ||
-            product.name
-              .toUpperCase()
-              .includes(searchFilter.value.toUpperCase()))
-      )
-    : [];
+  console.log(noTagsFilter.value);
+  return products.value.filter((product) => {
+    const matchesTags = noTagsFilter.value
+      ? !product.tags || product.tags.length === 0
+      : selectedTags.value.length === 0 ||
+        product.tags?.some((tag) =>
+          selectedTags.value.map((_) => _.name).includes(tag)
+        );
+
+    const matchesSearch =
+      searchFilter.value.length === 0 ||
+      product.name.toUpperCase().includes(searchFilter.value.toUpperCase());
+
+    return matchesTags && matchesSearch;
+  });
 });
 
 const tags = computed(() => {
@@ -125,6 +132,7 @@ async function saveProduct(product: Product) {
       color: 'green',
     });
     popupDetailOpen.value = false;
+    productStore.fetchProducts();
   } else {
     $q.notify({
       caption: 'Failed to update product',
