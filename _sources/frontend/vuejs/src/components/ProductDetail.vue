@@ -2,12 +2,19 @@
   <q-dialog v-model="isOpen">
     <q-card class="my-card">
       <div class="relative">
-        <q-img :src="product.image ?? ''" :ratio="16 / 9" width="500px">
-          <div class="absolute-bottom text-subtitle2 text-center">
+        <q-img
+          :src="product.image || defaultImage"
+          :ratio="16 / 9"
+          width="500px"
+        >
+          <div
+            class="absolute-bottom text-subtitle2 text-center"
+            v-if="lowestPrice"
+          >
             {{ lowestPrice }} € /
           </div>
           <q-btn
-            v-close-popup
+            @click="isOpen = false"
             color="primary"
             rounded
             class="absolute-top-right"
@@ -20,7 +27,14 @@
         <q-tab-panel name="infos">
           <q-card-section>
             <div class="row no-wrap items-center">
-              <div class="col text-h6 ellipsis">{{ product.name }}</div>
+              <div class="col text-h6 ellipsis">
+                <q-input
+                  color="purple-12"
+                  v-model="editingProduct.name"
+                  label="Name"
+                >
+                </q-input>
+              </div>
               <div
                 class="col-auto text-grey text-caption q-pt-md row no-wrap items-center"
               ></div>
@@ -109,7 +123,7 @@ const tab = ref('infos');
 
 // Calculate this on back
 const lowestPrice = computed(() => {
-  return props.product.prices
+  return props.product.prices && props.product.prices.length > 0
     ? Math.min(...props.product.prices.map((priceItem) => priceItem.price))
     : null;
 });
@@ -144,4 +158,7 @@ const priceColumns = [
     style: 'width: 100px',
   },
 ];
+
+const defaultImage =
+  'https://cdn.arihantbooks.com/assets/ProductImage/product-not-found.png';
 </script>

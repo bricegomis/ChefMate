@@ -11,6 +11,15 @@
     title="Produits"
     :rows-per-page-options="[20, 50, 100]"
   >
+    <template v-slot:top-right>
+      <q-btn
+        color="primary"
+        icon-right="add"
+        label="Create new"
+        no-caps
+        @click="createNewProduct"
+      />
+    </template>
     <!-- BODY SLOT -->
     <template v-slot:body="props">
       <q-tr :props="props">
@@ -54,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { Product } from 'src/models/Product';
+import { createDefaultProduct, Product } from 'src/models/Product';
 import { ProductQuantityUnit } from 'src/models/ProductQuantityUnit';
 import { computed } from 'vue';
 
@@ -77,6 +86,10 @@ function deleteProduct(product: Product) {
 
 function openProduct(product: Product) {
   emit('open-product', product);
+}
+
+function createNewProduct() {
+  emit('open-product', createDefaultProduct());
 }
 
 const columns = [
@@ -112,11 +125,12 @@ const allColumns = computed(() => {
 
 const productsWithMeta = computed(() => {
   return props.filteredProducts.map((product) => {
-    const lowestPriceItem = product.prices
-      ? product.prices.reduce((min, current) =>
-          current.price < min.price ? current : min
-        )
-      : null;
+    const lowestPriceItem =
+      (product.prices ?? []).length > 0
+        ? product.prices?.reduce((min, current) =>
+            current.price < min.price ? current : min
+          )
+        : null;
 
     const storePrices = props.stores.reduce(
       (

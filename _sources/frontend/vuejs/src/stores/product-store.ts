@@ -55,16 +55,18 @@ export const useProductStore = defineStore('ProductStore', () => {
     }
   };
 
-  const updateProduct = async (product: Product) => {
+  const updateProduct = async (product: Product): Promise<boolean> => {
     try {
       if (product.id) {
-        await api.put('product', product);
+        await api.put(`product/${product.id}`, product);
       } else {
-        await api.post('Product', product);
+        await api.post('product', product);
       }
       await fetchProducts();
+      return true;
     } catch (error) {
       console.error('Error when editing a product:', error);
+      return false;
     }
   };
 

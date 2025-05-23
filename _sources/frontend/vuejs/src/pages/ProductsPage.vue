@@ -72,14 +72,15 @@ const filteredProducts = computed(() => {
   return selectedTags.value.length
     ? products.value.filter(
         (product) =>
-          product.tags &&
-          product.tags.some((tag) =>
-            selectedTags.value.map((_) => _.name).includes(tag)
-          ) &&
+          (product.tags == null ||
+            product.tags?.length < 1 ||
+            product.tags?.some((tag) =>
+              selectedTags.value.map((_) => _.name).includes(tag)
+            )) &&
           (searchFilter.value.length === 0 ||
             product.name
-              .toLowerCase()
-              .includes(searchFilter.value.toLowerCase()))
+              .toUpperCase()
+              .includes(searchFilter.value.toUpperCase()))
       )
     : [];
 });
@@ -115,14 +116,22 @@ function handleOpenProduct(product: Product) {
   editingProduct.value = product;
 }
 
-function saveProduct(product: Product) {
-  productStore.updateProduct(product);
-  $q.notify({
-    caption: 'Product updated successfully',
-    message: product.name,
-    color: 'green',
-  });
-  popupDetailOpen.value = false;
+async function saveProduct(product: Product) {
+  const success = await productStore.updateProduct(product);
+  if (success) {
+    $q.notify({
+      caption: 'Product updated successfully',
+      message: product.name,
+      color: 'green',
+    });
+    popupDetailOpen.value = false;
+  } else {
+    $q.notify({
+      caption: 'Failed to update product',
+      message: product.name,
+      color: 'red',
+    });
+  }
 }
 
 defineOptions({
