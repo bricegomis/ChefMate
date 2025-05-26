@@ -10,6 +10,7 @@ public interface IProductRepository
     Task AddAsync(ProductDocument product);
     Task<ProductDocument> GetByIdAsync(string id);
     Task<List<ProductDocument>> GetAllAsync(string profileId);
+    Task<List<string>> GetTagsAsync(string profileId);
     Task UpdateAsync(ProductDocument product);
     Task DeleteAsync(string id);
 }
@@ -33,6 +34,15 @@ public class ProductRepository(
     {
         return await session.Query<ProductDocument>()
             .Where(x => x.ProfileId == profileId)
+            .ToListAsync();
+    }
+
+    public async Task<List<string>> GetTagsAsync(string profileId)
+    {
+        return await session.Query<ProductDocument>()
+            .Where(x => x.ProfileId == profileId)
+            .SelectMany(_ => _.Tags ?? new List<string>())
+            .Distinct()
             .ToListAsync();
     }
 

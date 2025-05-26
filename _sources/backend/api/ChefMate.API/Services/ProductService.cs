@@ -18,6 +18,11 @@ public class ProductService(IProductRepository repository, IProductMapper mapper
         return _repository.GetAllAsync(profileId);
     }
 
+    public Task<List<string>> GetTagsAsync(string profileId)
+    {
+        return _repository.GetTagsAsync(profileId);
+    }
+
     public Task<ProductDocument> GetByIdAsync(string id)
     {
         return _repository.GetByIdAsync(id);

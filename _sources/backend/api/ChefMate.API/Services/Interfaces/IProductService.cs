@@ -6,6 +6,7 @@ namespace ChefMate.API.Services.Interfaces;
 public interface IProductService
 {
     Task<List<ProductDocument>> GetAllAsync(string profileId);
+    Task<List<string>> GetTagsAsync(string profileId);
     Task<ProductDocument> GetByIdAsync(string id);
     Task DeleteAsync(string id);
     Task<ProductDocument> AddAsync(ProductCreateDto dto, string profileId);

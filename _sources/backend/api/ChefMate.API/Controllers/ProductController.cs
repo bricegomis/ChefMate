@@ -29,6 +29,14 @@ public class ProductController(
         return Ok(dtos);
     }
 
+    [HttpGet("tags")]
+    public async Task<ActionResult<List<string>>> GetTags()
+    {
+        var profileId = _profileContext.GetCurrentProfileId(User);
+        var tags = await _service.GetTagsAsync(profileId);
+        return Ok(tags);
+    }
+
     [HttpPost]
     public async Task<ActionResult<ProductDto>> Create([FromBody] ProductCreateDto dto)
     {
