@@ -16,7 +16,6 @@
       :filteredProducts="filteredProducts"
       :allTypes="tags.map((_) => _.name)"
       :selectedTags="selectedTags.map((_) => _.name)"
-      @delete-product="handleDeleteProduct"
       @open-product="handleOpenProduct"
       :stores="stores"
       :show-store-columns="showStoreColumns"
@@ -28,6 +27,7 @@
       :usages="Object.values(ProductUsageType)"
       @close="popupDetailOpen = false"
       @save="saveProduct"
+      @delete="deleteProduct"
     />
   </q-page>
 </template>
@@ -102,19 +102,29 @@ const stores = computed(() => {
   return productStore.stores;
 });
 
-function handleDeleteProduct(product: Product) {
+function deleteProduct(product: Product) {
   $q.dialog({
     title: 'Confirm',
     message: 'Are you sure',
     cancel: true,
     persistent: true,
-  }).onOk(() => {
-    productStore.deleteProduct(product);
-    $q.notify({
-      message: 'Product deleted',
-      caption: product.name,
-      color: 'green',
-    });
+  }).onOk(async () => {
+    const success = await productStore.deleteProduct(product);
+    if (success) {
+      $q.notify({
+        caption: 'Product deleted',
+        message: product.name,
+        color: 'green',
+      });
+      popupDetailOpen.value = false;
+      productStore.fetchProducts();
+    } else {
+      $q.notify({
+        caption: 'Failed to deleted product',
+        message: product.name,
+        color: 'red',
+      });
+    }
   });
 }
 

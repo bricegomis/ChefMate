@@ -26,12 +26,7 @@
 
         <q-toolbar-title class="text-accent">
           Chef Mate
-          <q-icon
-            color="red"
-            size="ml"
-            name="wifi"
-            v-if="!productStore.isOnline"
-          />
+          <q-icon color="red" size="ml" name="wifi" v-if="!isOnline" />
         </q-toolbar-title>
 
         <div
@@ -62,7 +57,7 @@
 <script setup lang="ts">
 import { useProductStore } from 'src/stores/product-store';
 import { useRouter } from 'vue-router';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { CustomRouteRecordRaw } from '../router/types';
 
 const productStore = useProductStore();
@@ -76,4 +71,20 @@ const routes = computed(
       (route) => route.name && route.path !== '/:catchAll(.*)*'
     ) as CustomRouteRecordRaw[]
 );
+
+const isOnline = ref(navigator.onLine);
+
+const updateOnlineStatus = () => {
+  isOnline.value = navigator.onLine;
+};
+
+onMounted(() => {
+  window.addEventListener('online', updateOnlineStatus);
+  window.addEventListener('offline', updateOnlineStatus);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('online', updateOnlineStatus);
+  window.removeEventListener('offline', updateOnlineStatus);
+});
 </script>

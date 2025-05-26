@@ -6,7 +6,6 @@ import { api } from 'boot/axios';
 
 export const useProductStore = defineStore('ProductStore', () => {
   const profile = ref<Profile>();
-  const isOnline = ref(false);
   const products = ref<Product[]>([]);
   const tags = computed(() =>
     Object.entries(
@@ -71,12 +70,13 @@ export const useProductStore = defineStore('ProductStore', () => {
     }
   };
 
-  const deleteProduct = async (product: Product) => {
+  const deleteProduct = async (product: Product): Promise<boolean> => {
     try {
       await api.delete(`product/${product.id}`);
-      await fetchProducts();
+      return true;
     } catch (error) {
       console.error('Error deleting Product:', error);
+      return false;
     }
   };
 
@@ -85,7 +85,6 @@ export const useProductStore = defineStore('ProductStore', () => {
     tags,
     stores,
     profile,
-    isOnline,
     fetchProducts,
     createProduct,
     updateProduct,

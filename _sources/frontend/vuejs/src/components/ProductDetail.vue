@@ -2,15 +2,8 @@
   <q-dialog v-model="isOpen">
     <q-card class="my-card">
       <div class="relative">
-        <q-img
-          :src="product.image || defaultImage"
-          :ratio="16 / 9"
-          width="500px"
-        >
-          <div
-            class="absolute-bottom text-subtitle2 text-center"
-            v-if="lowestPrice"
-          >
+        <q-img :src="product.image || defaultImage" :ratio="16 / 9" width="500px">
+          <div class="absolute-bottom text-subtitle2 text-center" v-if="lowestPrice">
             {{ lowestPrice }} € /
           </div>
           <q-btn
@@ -29,11 +22,7 @@
             <div class="row no-wrap items-center">
               <div class="col">
                 <q-rating v-model="stars" :max="5" size="16px" />
-                <q-input
-                  color="purple-12"
-                  v-model="editingProduct.name"
-                  label="Name"
-                />
+                <q-input color="purple-12" v-model="editingProduct.name" label="Name" />
                 <q-select
                   v-model="editingProduct.usages"
                   :options="usages"
@@ -95,15 +84,10 @@
           <q-tab name="prices" icon="history" label="Prices" />
         </q-tabs> -->
         <q-btn flat @click="tab = 'infos'" color="primary" label="Infos" />
-        <q-btn
-          flat
-          @click="tab = 'prices'"
-          color="primary"
-          round
-          label="prices"
-        />
+        <q-btn flat @click="tab = 'prices'" color="primary" round label="prices" />
         <q-space />
         <q-btn flat icon="save" @click="SaveProduct" />
+        <q-btn flat icon="delete" @click="DeleteProduct" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -125,6 +109,7 @@ const editingProduct = computed(() => props.product);
 const emit = defineEmits<{
   (e: 'close', value: boolean): void;
   (e: 'save', value: Product): void;
+  (e: 'delete', value: Product): void;
 }>();
 
 const isOpen = computed({
@@ -146,6 +131,10 @@ const lowestPrice = computed(() => {
 
 function SaveProduct() {
   emit('save', editingProduct.value);
+}
+
+function DeleteProduct() {
+  emit('delete', editingProduct.value);
 }
 
 const priceColumns = [

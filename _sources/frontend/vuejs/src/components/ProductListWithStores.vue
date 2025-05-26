@@ -1,7 +1,7 @@
 <template>
   <q-table
     class="my-sticky-header-column-table"
-    :columns="columns"
+    :columns="allColumns"
     :rows="productsWithMeta"
     row-key="id"
     separator="cell"
@@ -10,7 +10,6 @@
     dense
     title="Produits"
     :rows-per-page-options="[20, 50, 100]"
-    @row-click="openProduct"
   >
     <template v-slot:top-right>
       <q-btn
@@ -21,11 +20,44 @@
         @click="createNewProduct"
       />
     </template>
+    <!-- BODY SLOT -->
+    <template v-slot:body="props">
+      <q-tr :props="props">
+        <!-- NAME -->
+        <q-td
+          :props="props"
+          key="name"
+          @click="openProduct(props.row)"
+          class="cursor-pointer"
+        >
+          <span class="">{{ props.row.name }}</span>
+          <br />
+          <span class="text-italic text-caption text-left">{{
+            props.row.description
+          }}</span>
+        </q-td>
+        <q-td :props="props" key="actions"> </q-td>
+        <q-td :props="props" key="tags">
+          {{ props.row.tags.join(', ') }}
+        </q-td>
+        <q-td :props="props" key="lowestPriceItem">
+          {{
+            props.row.lowestPriceItem
+              ? `${props.row.lowestPriceItem.price}€/${props.row.lowestPriceItem.unit}`
+              : 'N/A'
+          }}
+        </q-td>
+        <q-td v-for="col in props.cols.slice(3)" :key="col.name" :props="props">
+          <span>{{ col.value }}</span>
+        </q-td>
+      </q-tr>
+    </template>
   </q-table>
 </template>
 
 <script setup lang="ts">
 import { createDefaultProduct, Product } from 'src/models/Product';
+import { ProductQuantityUnit } from 'src/models/ProductQuantityUnit';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -41,7 +73,7 @@ const emit = defineEmits<{
   (event: 'open-product', product: Product): void;
 }>();
 
-function openProduct(evt: Event, product: Product) {
+function openProduct(product: Product) {
   emit('open-product', product);
 }
 
@@ -65,16 +97,27 @@ const columns = [
     style: 'width: 250px',
   },
   { name: 'tags', label: 'Tags', field: 'tags', sortable: true },
-  // {
-  //   name: 'lowestPriceItem',
-  //   label: 'Lowest Price',
-  //   field: 'lowestPriceItem',
-  //   sortable: true,
-  //   format: (val: { value: number; unit: ProductQuantityUnit | null }) => {
-  //     return val ? `${val.value}€/${val.unit}` : '-';
-  //   },
-  // },
+  {
+    name: 'lowestPriceItem',
+    label: 'Lowest Price',
+    field: 'lowestPriceItem',
+    sortable: true,
+  },
 ];
+// Add a column for each store
+const storeColumns = props.stores.map((store) => ({
+  name: store,
+  label: store,
+  field: store, // Use a unique string identifier for the field
+  format: (val: { value: number; unit: ProductQuantityUnit | null }) => {
+    return val ? `${val.value}€/${val.unit}` : '-';
+  },
+  sortable: true,
+}));
+
+const allColumns = computed(() => {
+  return props.showStoreColumns ? columns.concat(storeColumns) : columns;
+});
 
 const productsWithMeta = computed(() => {
   return props.filteredProducts.map((product) => {
@@ -85,9 +128,36 @@ const productsWithMeta = computed(() => {
           )
         : null;
 
+    const storePrices = props.stores.reduce(
+      (
+        acc: {
+          [key: string]: {
+            value: number;
+            unit: ProductQuantityUnit | null;
+          } | null;
+        },
+        store: string
+      ) => {
+        const priceItem = product.prices?.find(
+          (price) => price.storeId === store
+        );
+        if (!priceItem) {
+          acc[store] = null;
+          return acc;
+        }
+        acc[store] = {
+          value: priceItem.price,
+          unit: priceItem.unit,
+        };
+        return acc;
+      },
+      {}
+    );
+
     return {
       ...product,
       lowestPriceItem,
+      storePrices,
     };
   });
 });
