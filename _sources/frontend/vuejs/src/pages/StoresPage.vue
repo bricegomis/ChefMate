@@ -1,5 +1,5 @@
 <template>
-  <q-page title="Stores">
+  <q-page title="Stores" style="background-color: #f5f5f5">
     <q-card class="q-pa-md">
       <q-btn
         color="primary"
