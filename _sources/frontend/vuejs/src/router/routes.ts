@@ -31,6 +31,21 @@ const routes: CustomRouteRecordRaw[] = [
     ],
   },
   {
+    path: '/stores',
+    name: 'Stores',
+    icon: 'store',
+    component: () => import('layouts/MainLayout.vue'),
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '/stores',
+        name: 'stores',
+        component: () => import('pages/StoresPage.vue'),
+        meta: { transition: 'slide-left' },
+      },
+    ],
+  },
+  {
     path: '/chatgpt',
     name: 'Chatgpt',
     icon: 'chat',

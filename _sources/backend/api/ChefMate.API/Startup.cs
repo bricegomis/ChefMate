@@ -136,7 +136,7 @@ public class Startup(IConfiguration configuration)
                     return "Profiles";
                 if (type.ToString().EndsWith("Document"))
                 {
-                    return type.Name[..^"Document".Length];
+                    return type.Name[..^"Document".Length] + "s";
                 }
                 return DocumentConventions.DefaultGetCollectionName(type);
             };
