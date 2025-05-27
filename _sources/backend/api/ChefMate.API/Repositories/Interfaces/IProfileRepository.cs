@@ -1,7 +1,7 @@
 using ChefMate.API.Models.Documents;
 using System.Threading.Tasks;
 
-namespace ChefMate.API.Repositories;
+namespace ChefMate.API.Repositories.Interfaces;
 
 public interface IProfileRepository
 {

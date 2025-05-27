@@ -29,6 +29,14 @@ public class ProductController(
         return Ok(dtos);
     }
 
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById([FromRoute] string id)
+    {
+        var store = await _service.GetByIdAsync(id);
+        if (store == null) return NotFound();
+        return Ok(store);
+    }
+
     [HttpGet("tags")]
     public async Task<ActionResult<List<string>>> GetTags()
     {

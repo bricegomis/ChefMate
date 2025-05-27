@@ -1,19 +1,10 @@
 ﻿using ChefMate.API.Attributes;
 using ChefMate.API.Models.Documents;
+using ChefMate.API.Repositories.Interfaces;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
 
 namespace ChefMate.API.Repositories;
-
-public interface IProductRepository
-{
-    Task AddAsync(ProductDocument product);
-    Task<ProductDocument> GetByIdAsync(string id);
-    Task<List<ProductDocument>> GetAllAsync(string profileId);
-    Task<List<string>> GetTagsAsync(string profileId);
-    Task UpdateAsync(ProductDocument product);
-    Task DeleteAsync(string id);
-}
 
 [Injectable]
 public class ProductRepository(
