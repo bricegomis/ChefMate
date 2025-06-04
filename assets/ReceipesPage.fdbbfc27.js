@@ -1,1 +1,0 @@
-import{Q as c}from"./QPage.1eda6fe3.js";import{Y as s,Z as o}from"./index.29f4baef.js";var p=(e,_)=>{const t=e.__vccOpts||e;for(const[a,r]of _)t[a]=r;return t};const n={__name:"ReceipesPage",setup(e){return(_,t)=>(s(),o(c,{title:"Receipes"}))}};var v=p(n,[["__scopeId","data-v-92394d90"]]);export{v as default};
