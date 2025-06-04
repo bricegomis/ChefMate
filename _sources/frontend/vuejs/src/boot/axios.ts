@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useProfileStore } from 'src/stores/profile-store';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'api/',
+  baseURL: import.meta.env.VITE_API_BASE_URL,
 });
 
 export default boot(({ app, router }) => {
