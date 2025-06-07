@@ -5,7 +5,6 @@
         :tags="tags"
         :usages="Object.values(ProductUsageType)"
         :search="searchFilter"
-        :showStoreColumns="showStoreColumns"
         @search="onSearch"
         @showStoreColumns="onShowStoreColumns"
         @filterNoTags="onFilterNoTags"
@@ -94,10 +93,10 @@ const filteredProducts = computed(() => {
 const tags = computed(() => {
   const storeTags = productStore.tags;
   return storeTags.map((tag) => ({
-    name: tag,
+    name: tag.tag,
     isSelected: false,
     nbOccurrence: products.value.filter((product) =>
-      product.tags?.includes(tag)
+      product.tags?.includes(tag.tag)
     ).length,
   }));
 });

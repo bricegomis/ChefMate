@@ -54,16 +54,14 @@ const columns = [
     label: 'Name',
     field: 'name',
     sortable: true,
-    style: 'width: 250px',
   },
+  { name: 'tags', label: 'Tags', field: 'tags', sortable: true },
   {
     name: 'usage',
     label: 'usage',
     field: 'usages',
     sortable: true,
-    style: 'width: 250px',
   },
-  { name: 'tags', label: 'Tags', field: 'tags', sortable: true },
   // {
   //   name: 'lowestPriceItem',
   //   label: 'Lowest Price',

@@ -1,4 +1,5 @@
 ﻿using ChefMate.API.Attributes;
+using ChefMate.API.Indexes;
 using ChefMate.API.Mapping.Interfaces;
 using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Dto.Product;
@@ -18,7 +19,7 @@ public class ProductService(IProductRepository repository, IProductMapper mapper
         return _repository.GetAllAsync(profileId);
     }
 
-    public Task<List<string>> GetTagsAsync(string profileId)
+    public Task<List<ProductTagsIndex.Result>> GetTagsAsync(string profileId)
     {
         return _repository.GetTagsAsync(profileId);
     }

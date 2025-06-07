@@ -30,13 +30,10 @@ public class ProductRepository(
             .ToListAsync();
     }
 
-    public async Task<List<string>> GetTagsAsync(string profileId)
+    public async Task<List<ProductTagsIndex.Result>> GetTagsAsync(string profileId)
     {
-        // Query the index to get tags for the given profileId
         return await session.Query<ProductTagsIndex.Result, ProductTagsIndex>()
             .Where(x => x.ProfileId == profileId)
-            .Select(x => x.Tag)
-            .Distinct()
             .ToListAsync();
     }
 

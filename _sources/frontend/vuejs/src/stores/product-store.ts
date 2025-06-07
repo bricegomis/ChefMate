@@ -3,34 +3,49 @@ import { ref } from 'vue';
 import { Product } from 'src/models/Product';
 import { Profile } from 'src/models/Profile';
 import { api } from 'boot/axios';
+import { TagInfo } from 'src/models/tagInfo';
+
+const localStorageProductsKey = 'products';
+const localStorageTagsKey = 'tags';
 
 export const useProductStore = defineStore('ProductStore', () => {
   const profile = ref<Profile>();
   const products = ref<Product[]>([]);
-  const tags = ref<string[]>([]);
+  const tags = ref<TagInfo[]>([]);
 
-  const loadProductsFromLocalStorage = () => {
-    const stored = localStorage.getItem('products');
-    if (stored) {
+  const loadFromLocalStorage = () => {
+    const storeProducts = localStorage.getItem(localStorageProductsKey);
+    if (storeProducts) {
       try {
-        products.value = JSON.parse(stored);
+        products.value = JSON.parse(storeProducts);
+      } catch (e) {
+        products.value = [];
+      }
+    }
+    const storedTags = localStorage.getItem(localStorageTagsKey);
+    if (storedTags) {
+      try {
+        products.value = JSON.parse(storedTags);
       } catch (e) {
         products.value = [];
       }
     }
   };
 
-  const saveProductsToLocalStorage = () => {
-    localStorage.setItem('products', JSON.stringify(products.value));
+  const saveToLocalStorage = () => {
+    localStorage.setItem(
+      localStorageProductsKey,
+      JSON.stringify(products.value)
+    );
+    localStorage.setItem(localStorageTagsKey, JSON.stringify(products.value));
   };
 
-  loadProductsFromLocalStorage();
+  loadFromLocalStorage();
 
   const fetchProducts = async () => {
     try {
       const response = await api.get('product');
       products.value = response.data;
-      saveProductsToLocalStorage();
     } catch (error) {
       console.error('Error fetching Products:', error);
     }
@@ -39,6 +54,7 @@ export const useProductStore = defineStore('ProductStore', () => {
   const fetchAll = async () => {
     await fetchProducts();
     await fetchTags();
+    saveToLocalStorage();
   };
 
   const fetchTags = async () => {

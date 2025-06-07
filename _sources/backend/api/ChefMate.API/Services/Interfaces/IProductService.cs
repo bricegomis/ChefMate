@@ -1,4 +1,5 @@
-﻿using ChefMate.API.Models.Documents;
+﻿using ChefMate.API.Indexes;
+using ChefMate.API.Models.Documents;
 using ChefMate.API.Models.Dto.Product;
 
 namespace ChefMate.API.Services.Interfaces;
@@ -6,7 +7,7 @@ namespace ChefMate.API.Services.Interfaces;
 public interface IProductService
 {
     Task<List<ProductDocument>> GetAllAsync(string profileId);
-    Task<List<string>> GetTagsAsync(string profileId);
+    Task<List<ProductTagsIndex.Result>> GetTagsAsync(string profileId);
     Task<ProductDocument> GetByIdAsync(string id);
     Task DeleteAsync(string id);
     Task<ProductDocument> AddAsync(ProductCreateDto dto, string profileId);

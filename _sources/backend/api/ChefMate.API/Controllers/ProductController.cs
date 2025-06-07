@@ -1,4 +1,5 @@
 using ChefMate.API.Mapping.Interfaces;
+using ChefMate.API.Models.Dto;
 using ChefMate.API.Models.Dto.Product;
 using ChefMate.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -38,10 +39,16 @@ public class ProductController(
     }
 
     [HttpGet("tags")]
-    public async Task<ActionResult<List<string>>> GetTags()
+    public async Task<ActionResult<List<TagInfo>>> GetTags()
     {
         var profileId = _profileContext.GetCurrentProfileId(User);
-        var tags = await _service.GetTagsAsync(profileId);
+        var tags = (await _service.GetTagsAsync(profileId))
+            .OrderBy(_ => _.Count)
+            .Select(_ => new TagInfo {
+                Tag = _.Tag,
+                Count = _.Count
+            })
+            .ToList();
         return Ok(tags);
     }
 

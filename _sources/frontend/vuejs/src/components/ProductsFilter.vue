@@ -37,9 +37,6 @@
         <span>No Tags</span>
       </q-btn>
     </div>
-    <div>
-      <q-checkbox v-model="showStoreColumnsFilter" label="Show store columns" />
-    </div>
   </div>
 </template>
 
@@ -53,21 +50,12 @@ const props = defineProps<{
     isSelected: boolean;
     nbOccurrence: number;
   }[];
-  showStoreColumns: boolean;
 }>();
 
 const searchFilter = computed({
   get: () => props.search,
   set: (value: string) => {
     emit('search', value);
-  },
-});
-
-const showStoreColumnsFilter = computed({
-  get: () => props.showStoreColumns,
-  set: (value: boolean) => {
-    console.log('showStoreColumns', value);
-    emit('showStoreColumns', value);
   },
 });
 
