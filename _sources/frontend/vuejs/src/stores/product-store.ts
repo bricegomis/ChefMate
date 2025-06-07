@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, reactive, computed } from 'vue';
+import { ref } from 'vue';
 import { Product } from 'src/models/Product';
 import { Profile } from 'src/models/Profile';
 import { api } from 'boot/axios';
@@ -7,48 +7,53 @@ import { api } from 'boot/axios';
 export const useProductStore = defineStore('ProductStore', () => {
   const profile = ref<Profile>();
   const products = ref<Product[]>([]);
-  const tags = computed(() =>
-    Object.entries(
-      products.value.reduce((acc: Record<string, number>, product) => {
-        for (const tag of product.tags || []) {
-          acc[tag] = (acc[tag] || 0) + 1; // Count occurrences
-        }
-        return acc;
-      }, {})
-    )
-      .sort((a, b) => b[1] - a[1]) // Sort by occurrences in descending order
-      .map(([name, nbOccurrence]) =>
-        reactive({
-          name,
-          isSelected: false,
-          nbOccurrence,
-        })
-      )
-  );
-  // Create the list of stores
-  const stores = computed(() =>
-    Array.from(
-      new Set(
-        products.value.flatMap(
-          (product) => product.prices?.map((price) => price.storeId) || []
-        )
-      )
-    )
-  );
+  const tags = ref<string[]>([]);
+
+  const loadProductsFromLocalStorage = () => {
+    const stored = localStorage.getItem('products');
+    if (stored) {
+      try {
+        products.value = JSON.parse(stored);
+      } catch (e) {
+        products.value = [];
+      }
+    }
+  };
+
+  const saveProductsToLocalStorage = () => {
+    localStorage.setItem('products', JSON.stringify(products.value));
+  };
+
+  loadProductsFromLocalStorage();
 
   const fetchProducts = async () => {
     try {
       const response = await api.get('product');
       products.value = response.data;
+      saveProductsToLocalStorage();
     } catch (error) {
       console.error('Error fetching Products:', error);
+    }
+  };
+
+  const fetchAll = async () => {
+    await fetchProducts();
+    await fetchTags();
+  };
+
+  const fetchTags = async () => {
+    try {
+      const response = await api.get('product/tags');
+      tags.value = response.data;
+    } catch (error) {
+      console.error('Error fetching tags:', error);
     }
   };
 
   const createProduct = async (product: Product) => {
     try {
       await api.post('product', product);
-      await fetchProducts();
+      await fetchAll();
     } catch (error) {
       console.error('Error creating Product:', error);
     }
@@ -62,7 +67,7 @@ export const useProductStore = defineStore('ProductStore', () => {
       } else {
         await api.post('product', product);
       }
-      await fetchProducts();
+      await fetchAll();
       return true;
     } catch (error) {
       console.error('Error when editing a product:', error);
@@ -73,6 +78,7 @@ export const useProductStore = defineStore('ProductStore', () => {
   const deleteProduct = async (product: Product): Promise<boolean> => {
     try {
       await api.delete(`product/${product.id}`);
+      await fetchAll();
       return true;
     } catch (error) {
       console.error('Error deleting Product:', error);
@@ -83,9 +89,8 @@ export const useProductStore = defineStore('ProductStore', () => {
   return {
     products,
     tags,
-    stores,
     profile,
-    fetchProducts,
+    fetchAll,
     createProduct,
     updateProduct,
     deleteProduct,

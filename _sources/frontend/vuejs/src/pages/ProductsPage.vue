@@ -17,7 +17,6 @@
       :allTypes="tags.map((_) => _.name)"
       :selectedTags="selectedTags.map((_) => _.name)"
       @open-product="handleOpenProduct"
-      :stores="stores"
       :show-store-columns="showStoreColumns"
     />
     <ProductDetail
@@ -59,7 +58,7 @@ const editingProduct = ref<Product>();
 
 // Fetch products when the page is loaded
 onMounted(() => {
-  productStore.fetchProducts();
+  productStore.fetchAll();
 });
 
 function onSearch(searchQuery: string) {
@@ -93,14 +92,17 @@ const filteredProducts = computed(() => {
 });
 
 const tags = computed(() => {
-  return productStore.tags;
+  const storeTags = productStore.tags;
+  return storeTags.map((tag) => ({
+    name: tag,
+    isSelected: false,
+    nbOccurrence: products.value.filter((product) =>
+      product.tags?.includes(tag)
+    ).length,
+  }));
 });
 
 const selectedTags = computed(() => tags.value.filter((_) => _.isSelected));
-
-const stores = computed(() => {
-  return productStore.stores;
-});
 
 function deleteProduct(product: Product) {
   $q.dialog({
@@ -117,7 +119,6 @@ function deleteProduct(product: Product) {
         color: 'green',
       });
       popupDetailOpen.value = false;
-      productStore.fetchProducts();
     } else {
       $q.notify({
         caption: 'Failed to deleted product',
@@ -142,7 +143,6 @@ async function saveProduct(product: Product) {
       color: 'green',
     });
     popupDetailOpen.value = false;
-    productStore.fetchProducts();
   } else {
     $q.notify({
       caption: 'Failed to update product',

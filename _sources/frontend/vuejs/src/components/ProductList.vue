@@ -32,7 +32,6 @@ const props = defineProps<{
   filteredProducts: Product[];
   allTypes: string[];
   selectedTags: string[];
-  stores: string[];
   showStoreColumns?: boolean;
 }>();
 
