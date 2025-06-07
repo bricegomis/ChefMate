@@ -3,6 +3,8 @@ using ChefMate.API.Models.Documents;
 using ChefMate.API.Repositories.Interfaces;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Session;
+using Raven.Client.Documents.Linq;
+using ChefMate.API.Indexes;
 
 namespace ChefMate.API.Repositories;
 
@@ -30,9 +32,10 @@ public class ProductRepository(
 
     public async Task<List<string>> GetTagsAsync(string profileId)
     {
-        return await session.Query<ProductDocument>()
+        // Query the index to get tags for the given profileId
+        return await session.Query<ProductTagsIndex.Result, ProductTagsIndex>()
             .Where(x => x.ProfileId == profileId)
-            .SelectMany(_ => _.Tags ?? new List<string>())
+            .Select(x => x.Tag)
             .Distinct()
             .ToListAsync();
     }

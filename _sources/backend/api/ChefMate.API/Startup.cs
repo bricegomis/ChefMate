@@ -12,6 +12,8 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.Json.Serialization;
+using Raven.Client.Documents.Indexes;
+using ChefMate.API.Indexes;
 
 namespace ChefMate.API;
 
@@ -156,6 +158,10 @@ public class Startup(IConfiguration configuration)
             };
 
             store.Initialize();
+
+            // Déploiement automatique de l'index ProductTagsIndex au démarrage
+            IndexCreation.CreateIndexes(typeof(ProductTagsIndex).Assembly, store);
+
             return store;
         });
         services.AddScoped(sp =>
