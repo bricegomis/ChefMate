@@ -75,6 +75,7 @@ function onFilterNoTags(value: boolean) {
 }
 
 const filteredProducts = computed(() => {
+  console.log(noTagsFilter.value);
   return products.value.filter((product) => {
     const matchesTags = noTagsFilter.value
       ? !product.tags || product.tags.length === 0
