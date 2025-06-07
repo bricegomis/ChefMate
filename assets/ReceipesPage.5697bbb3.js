@@ -1,0 +1,1 @@
+import{Q as e}from"./QPage.892a67c9.js";import{_}from"./plugin-vue_export-helper.21dcd24c.js";import{Y as a,Z as t}from"./index.9a216b57.js";const r={__name:"ReceipesPage",setup(s){return(p,c)=>(a(),t(e,{title:"Receipes"}))}};var n=_(r,[["__scopeId","data-v-92394d90"]]);export{n as default};
